@@ -1,0 +1,2406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Big Data Architecture Guide</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            line-height: 1.6;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 { 
+            text-align: center; 
+            color: #667eea; 
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .architecture {
+            background: #f8f9fa;
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 12px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .architecture h2 { 
+            color: #2d3748;
+            border-bottom: 3px solid #667eea; 
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .mermaid { 
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .detail-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .detail-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .detail-card p, .detail-card ul {
+            color: #4a5568;
+            font-size: 0.95em;
+        }
+        .detail-card ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .detail-card li {
+            margin: 5px 0;
+        }
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .pros {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+        .cons {
+            background: #f8d7da;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #dc3545;
+        }
+        .pros h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        .cons h3 {
+            color: #721c24;
+            margin-bottom: 10px;
+        }
+        .pros ul, .cons ul {
+            margin-left: 20px;
+            color: #333;
+        }
+        .pros li, .cons li {
+            margin: 8px 0;
+        }
+        .icon { font-size: 1.2em; }
+        .toc {
+            background: #edf2f7;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .toc h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        .toc ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 8px;
+            display: block;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .toc a:hover {
+            background: #667eea;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+            .details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Complete Big Data Architecture Guide</h1>
+        
+        <div class="toc">
+            <h2>📑 Table of Contents</h2>
+            <ul>
+                <li><a href="#hdfs">1. HDFS Architecture</a></li>
+                <li><a href="#mapreduce">2. MapReduce Processing</a></li>
+                <li><a href="#spark">3. Apache Spark</a></li>
+                <li><a href="#kafka">4. Apache Kafka</a></li>
+                <li><a href="#yarn">5. YARN Resource Management</a></li>
+                <li><a href="#hive">6. Apache Hive</a></li>
+                <li><a href="#hbase">7. Apache HBase</a></li>
+                <li><a href="#flume">8. Apache Flume</a></li>
+                <li><a href="#sqoop">9. Apache Sqoop</a></li>
+                <li><a href="#zookeeper">10. Apache ZooKeeper</a></li>
+                <li><a href="#oozie">11. Apache Oozie</a></li>
+                <li><a href="#security">12. Security Layer</a></li>
+                <li><a href="#monitoring">13. Monitoring Dashboard</a></li>
+                <li><a href="#datalake">14. Data Lake Architecture</a></li>
+                <li><a href="#lambda">15. Lambda Architecture</a></li>
+                <li><a href="#streaming">16. Spark Streaming</a></li>
+                <li><a href="#ml">17. ML Pipeline</a></li>
+                <li><a href="#ecosystem">18. Complete Ecosystem</a></li>
+            </ul>
+        </div>
+
+        <!-- 1. HDFS -->
+        <div class="architecture" id="hdfs">
+            <h2>📦 1. HDFS Architecture Flow</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    Client1[Client 1] --> NN[NameNode<br/>Metadata Manager]
+    Client2[Client 2] --> NN
+    
+    NN --> DN1[DataNode 1<br/>Blocks: A1, A3, B2]
+    NN --> DN2[DataNode 2<br/>Blocks: A2, B1, C1]
+    NN --> DN3[DataNode 3<br/>Blocks: A1, B1, C2]
+    NN --> DN4[DataNode 4<br/>Blocks: A2, B2, C1]
+    NN --> DN5[DataNode 5<br/>Blocks: A3, B2, C2]
+    
+    NN -.-> SNN[Secondary NameNode<br/>Checkpointing]
+    
+    style NN fill:#4CAF50
+    style DN1 fill:#2196F3
+    style DN2 fill:#2196F3
+    style DN3 fill:#2196F3
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is HDFS?</h3>
+                    <p>Hadoop Distributed File System (HDFS) is a distributed file system designed to store very large files across multiple machines in a Hadoop cluster. It provides high-throughput access to application data and is fault-tolerant.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use HDFS?</h3>
+                    <ul>
+                        <li>Store petabytes of data across commodity hardware</li>
+                        <li>Built-in fault tolerance through replication</li>
+                        <li>Optimized for large sequential reads/writes</li>
+                        <li>Cost-effective storage solution</li>
+                        <li>Designed for batch processing workloads</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Setup NameNode and DataNodes on cluster</li>
+                        <li>Use CLI: <code>hdfs dfs -put localfile /hdfs/path</code></li>
+                        <li>Configure replication factor (default: 3)</li>
+                        <li>Set block size (default: 128MB)</li>
+                        <li>Access via Java API, REST API, or CLI</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Storing large datasets (TBs to PBs)</li>
+                        <li>Batch processing requirements</li>
+                        <li>Write-once, read-many access patterns</li>
+                        <li>Need for data locality in processing</li>
+                        <li>Cost-effective storage needed</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Log aggregation and analysis</li>
+                        <li>Data lake implementations</li>
+                        <li>Archival storage systems</li>
+                        <li>Machine learning data storage</li>
+                        <li>ETL pipeline data staging</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>NameNode manages metadata (single point of failure)</li>
+                        <li>DataNodes store actual data blocks</li>
+                        <li>Secondary NameNode performs checkpointing</li>
+                        <li>Default block size: 128MB</li>
+                        <li>Replication factor: 3 (configurable)</li>
+                        <li>Rack-aware placement for reliability</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Highly fault-tolerant through replication</li>
+                        <li>Scalable to petabytes of data</li>
+                        <li>Cost-effective (commodity hardware)</li>
+                        <li>High throughput for large files</li>
+                        <li>Data locality optimization</li>
+                        <li>Automatic failure detection and recovery</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Not suitable for low-latency access</li>
+                        <li>Poor performance with small files</li>
+                        <li>No random writes (append-only)</li>
+                        <li>NameNode is single point of failure</li>
+                        <li>High storage overhead (3x replication)</li>
+                        <li>Not POSIX-compliant file system</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. MapReduce -->
+        <div class="architecture" id="mapreduce">
+            <h2>🌀 2. MapReduce Processing Flow</h2>
+            
+            <pre class="mermaid">
+flowchart LR
+    subgraph "Input Phase"
+        I1[Input Split 1]
+        I2[Input Split 2]
+        I3[Input Split 3]
+    end
+    
+    subgraph "Map Phase"
+        M1[Map Task 1]
+        M2[Map Task 2]
+        M3[Map Task 3]
+    end
+    
+    subgraph "Shuffle & Sort"
+        SS1[Partition & Sort]
+        SS2[Partition & Sort]
+    end
+    
+    subgraph "Reduce Phase"
+        R1[Reduce Task 1]
+        R2[Reduce Task 2]
+    end
+    
+    subgraph "Output"
+        O1[Output File 1]
+        O2[Output File 2]
+    end
+    
+    I1 --> M1
+    I2 --> M2
+    I3 --> M3
+    
+    M1 --> SS1
+    M2 --> SS1
+    M3 --> SS2
+    
+    SS1 --> R1
+    SS2 --> R2
+    
+    R1 --> O1
+    R2 --> O2
+    
+    style M1 fill:#FF9800
+    style R1 fill:#F44336
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is MapReduce?</h3>
+                    <p>MapReduce is a programming model and processing framework for distributed computing on large datasets. It divides work into Map (processing) and Reduce (aggregation) phases.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use MapReduce?</h3>
+                    <ul>
+                        <li>Process massive datasets in parallel</li>
+                        <li>Automatic parallelization and distribution</li>
+                        <li>Built-in fault tolerance</li>
+                        <li>Simple programming model</li>
+                        <li>Data locality optimization</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Write Mapper class (key-value output)</li>
+                        <li>Write Reducer class (aggregation logic)</li>
+                        <li>Configure input/output paths</li>
+                        <li>Submit job to YARN/Hadoop cluster</li>
+                        <li>Monitor job progress via UI</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Batch processing of large datasets</li>
+                        <li>Data aggregation and summarization</li>
+                        <li>Log analysis and processing</li>
+                        <li>ETL transformations</li>
+                        <li>Embarrassingly parallel problems</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Web log analysis</li>
+                        <li>Word count and text processing</li>
+                        <li>Data mining and analytics</li>
+                        <li>Search indexing</li>
+                        <li>Graph processing</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Map: Process input splits independently</li>
+                        <li>Shuffle: Group by key across network</li>
+                        <li>Reduce: Aggregate values per key</li>
+                        <li>Combiner: Optional local aggregation</li>
+                        <li>Partitioner: Controls key distribution</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Scales to petabytes of data</li>
+                        <li>Automatic parallelization</li>
+                        <li>Fault-tolerant (task re-execution)</li>
+                        <li>Simple programming abstraction</li>
+                        <li>Data locality optimization</li>
+                        <li>Battle-tested and stable</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>High latency (disk-based)</li>
+                        <li>Not suitable for iterative algorithms</li>
+                        <li>Inflexible two-stage model</li>
+                        <li>Excessive disk I/O</li>
+                        <li>Steep learning curve</li>
+                        <li>Being replaced by Spark in many cases</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Spark -->
+        <div class="architecture" id="spark">
+            <h2>⚡ 3. Apache Spark Architecture</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    Client[Spark Client] --> Driver[Driver Program]
+    
+    Driver --> CM[Cluster Manager<br/>YARN/Mesos/K8s]
+    
+    CM --> Worker1[Worker Node 1]
+    CM --> Worker2[Worker Node 2]
+    CM --> Worker3[Worker Node 3]
+    
+    Worker1 --> Exec1[Executor<br/>Tasks + Cache]
+    Worker2 --> Exec2[Executor<br/>Tasks + Cache]
+    Worker3 --> Exec3[Executor<br/>Tasks + Cache]
+    
+    Exec1 --> DS1[(HDFS/S3)]
+    Exec2 --> DS2[(HDFS/S3)]
+    Exec3 --> DS3[(HDFS/S3)]
+    
+    Driver <--> Exec1
+    Driver <--> Exec2
+    Driver <--> Exec3
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Spark?</h3>
+                    <p>Apache Spark is a unified analytics engine for large-scale data processing with built-in modules for SQL, streaming, machine learning, and graph processing. It uses in-memory computing for speed.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Spark?</h3>
+                    <ul>
+                        <li>100x faster than MapReduce (in-memory)</li>
+                        <li>Unified API for batch, streaming, ML, SQL</li>
+                        <li>Interactive data exploration</li>
+                        <li>Supports multiple languages (Scala, Python, Java, R)</li>
+                        <li>Rich ecosystem and libraries</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Install Spark cluster or use cloud services</li>
+                        <li>Write code using RDD/DataFrame/Dataset API</li>
+                        <li>Submit jobs: <code>spark-submit app.py</code></li>
+                        <li>Use Spark SQL for querying</li>
+                        <li>Leverage MLlib for machine learning</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Need for fast data processing</li>
+                        <li>Iterative algorithms (ML, graph)</li>
+                        <li>Interactive data analysis</li>
+                        <li>Real-time stream processing</li>
+                        <li>Complex multi-stage pipelines</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Machine learning pipelines</li>
+                        <li>Real-time analytics</li>
+                        <li>ETL at scale</li>
+                        <li>Interactive queries on big data</li>
+                        <li>Graph processing and analysis</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Driver: Coordinates execution</li>
+                        <li>Executors: Run tasks and cache data</li>
+                        <li>RDD: Resilient Distributed Dataset</li>
+                        <li>Lazy evaluation for optimization</li>
+                        <li>DAG execution engine</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Extremely fast (in-memory processing)</li>
+                        <li>Unified platform for multiple workloads</li>
+                        <li>Easy to use with high-level APIs</li>
+                        <li>Supports multiple languages</li>
+                        <li>Rich ecosystem (SQL, MLlib, GraphX)</li>
+                        <li>Active community and development</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>High memory requirements</li>
+                        <li>Complex to tune for optimal performance</li>
+                        <li>Steeper learning curve than SQL</li>
+                        <li>Can be expensive to run</li>
+                        <li>Less mature than MapReduce for some use cases</li>
+                        <li>Requires careful memory management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Kafka -->
+        <div class="architecture" id="kafka">
+            <h2>📨 4. Apache Kafka Architecture</h2>
+            
+            <pre class="mermaid">
+flowchart LR
+    P1[Producer 1] --> TopicA[Topic A<br/>Partition 0,1,2]
+    P2[Producer 2] --> TopicA
+    P3[Producer 3] --> TopicB[Topic B<br/>Partition 0,1]
+    
+    TopicA --> Broker1[Broker 1<br/>Leader]
+    TopicA --> Broker2[Broker 2<br/>Follower]
+    TopicA --> Broker3[Broker 3<br/>Follower]
+    
+    TopicB --> Broker2
+    TopicB --> Broker3
+    
+    Broker1 --> C1[Consumer Group 1]
+    Broker2 --> C1
+    Broker3 --> C1
+    
+    Broker1 --> C2[Consumer Group 2]
+    Broker2 --> C2
+    
+    ZK[ZooKeeper Ensemble] -.-> Broker1
+    ZK -.-> Broker2
+    ZK -.-> Broker3
+    
+    style Broker1 fill:#9C27B0
+    style ZK fill:#795548
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Kafka?</h3>
+                    <p>Apache Kafka is a distributed event streaming platform for high-throughput, fault-tolerant message queuing. It acts as a buffer between producers and consumers of data streams.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Kafka?</h3>
+                    <ul>
+                        <li>Handle millions of messages per second</li>
+                        <li>Decouple data producers from consumers</li>
+                        <li>Build real-time streaming pipelines</li>
+                        <li>Durable message storage</li>
+                        <li>Horizontal scalability</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Setup Kafka cluster with brokers</li>
+                        <li>Create topics with partitions</li>
+                        <li>Producers publish to topics</li>
+                        <li>Consumers subscribe to topics</li>
+                        <li>Use consumer groups for scaling</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Real-time data streaming</li>
+                        <li>Event-driven architectures</li>
+                        <li>Log aggregation at scale</li>
+                        <li>Messaging between microservices</li>
+                        <li>Stream processing pipelines</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Activity tracking and monitoring</li>
+                        <li>Log aggregation systems</li>
+                        <li>Stream processing applications</li>
+                        <li>Event sourcing patterns</li>
+                        <li>Metrics collection and monitoring</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Topics: Categories for messages</li>
+                        <li>Partitions: Parallel processing units</li>
+                        <li>Brokers: Kafka servers</li>
+                        <li>Consumer Groups: Scalable consumption</li>
+                        <li>Retention: Messages stored for configured time</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Extremely high throughput</li>
+                        <li>Low latency (milliseconds)</li>
+                        <li>Durable and fault-tolerant</li>
+                        <li>Horizontally scalable</li>
+                        <li>Strong ordering guarantees per partition</li>
+                        <li>Replayable message streams</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Complex to setup and operate</li>
+                        <li>ZooKeeper dependency (being removed)</li>
+                        <li>No built-in message transformation</li>
+                        <li>Requires careful partition planning</li>
+                        <li>Can be resource-intensive</li>
+                        <li>Learning curve for optimal usage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. YARN -->
+        <div class="architecture" id="yarn">
+            <h2>🔄 5. YARN Resource Management</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    Client[Client] --> RM[ResourceManager<br/>Master]
+    
+    RM --> NM1[NodeManager<br/>Worker 1]
+    RM --> NM2[NodeManager<br/>Worker 2]
+    RM --> NM3[NodeManager<br/>Worker 3]
+    
+    NM1 --> Container1[Container<br/>App Master]
+    NM1 --> Container2[Container<br/>Task]
+    
+    NM2 --> Container3[Container<br/>Task]
+    NM2 --> Container4[Container<br/>Task]
+    
+    NM3 --> Container5[Container<br/>Task]
+    
+    Container1 -.->|Requests| RM
+    RM -.->|Allocates| Container1
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is YARN?</h3>
+                    <p>Yet Another Resource Negotiator (YARN) is Hadoop's cluster resource management system. It manages compute resources and schedules applications across the cluster.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use YARN?</h3>
+                    <ul>
+                        <li>Centralized resource management</li>
+                        <li>Multi-tenancy support</li>
+                        <li>Run multiple frameworks (Spark, Flink, etc.)</li>
+                        <li>Better cluster utilization</li>
+                        <li>Scalability to thousands of nodes</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Configure ResourceManager and NodeManagers</li>
+                        <li>Set resource limits (CPU, memory)</li>
+                        <li>Submit applications via client</li>
+                        <li>Monitor via YARN UI</li>
+                        <li>Configure scheduling policies</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Running Hadoop ecosystem tools</li>
+                        <li>Multi-framework cluster management</li>
+                        <li>Need for resource isolation</li>
+                        <li>Large-scale cluster operations</li>
+                        <li>Batch processing workloads</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Hadoop clusters</li>
+                        <li>Multi-tenant data platforms</li>
+                        <li>Enterprise analytics environments</li>
+                        <li>Mixed workload clusters</li>
+                        <li>Resource-constrained environments</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>ResourceManager: Global scheduler</li>
+                        <li>NodeManager: Per-node agent</li>
+                        <li>ApplicationMaster: Per-app coordinator</li>
+                        <li>Container: Resource allocation unit</li>
+                        <li>Scheduling: Capacity, Fair, FIFO</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Better resource utilization</li>
+                        <li>Support for multiple frameworks</li>
+                        <li>Scalable to large clusters</li>
+                        <li>Flexible scheduling policies</li>
+                        <li>Built-in HA support</li>
+                        <li>Fine-grained resource control</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Complex configuration</li>
+                        <li>Additional operational overhead</li>
+                        <li>Learning curve for tuning</li>
+                        <li>ResourceManager can be bottleneck</li>
+                        <li>Limited container customization</li>
+                        <li>Being replaced by Kubernetes in some cases</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Hive -->
+        <div class="architecture" id="hive">
+            <h2>🏗️ 6. Apache Hive Architecture</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    UI[User Interface<br/>CLI/WebUI/JDBC] --> Driver[Driver]
+    
+    Driver --> Compiler[Compiler]
+    
+    Compiler --> Metastore[Metastore<br/>MySQL/Postgres]
+    Compiler --> Execution[Execution Engine]
+    
+    Execution --> MR[MapReduce]
+    Execution --> Tez[Tez]
+    Execution --> Spark[Spark]
+    
+    MR --> HDFS[(HDFS)]
+    Tez --> HDFS
+    Spark --> HDFS
+    
+    Metastore --> HDFS
+    
+    style Metastore fill:#FF5722
+    style Execution fill:#4CAF50
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Hive?</h3>
+                    <p>Apache Hive is a data warehouse software built on Hadoop that provides SQL-like interface for reading, writing, and managing large datasets in distributed storage.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Hive?</h3>
+                    <ul>
+                        <li>SQL interface for Hadoop data</li>
+                        <li>Easy for SQL developers to adopt</li>
+                        <li>Schema on read flexibility</li>
+                        <li>Integration with BI tools via JDBC/ODBC</li>
+                        <li>Batch processing at scale</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Create tables: <code>CREATE TABLE users...</code></li>
+                        <li>Load data: <code>LOAD DATA INPATH...</code></li>
+                        <li>Query with HiveQL: <code>SELECT * FROM...</code></li>
+                        <li>Use partitioning for performance</li>
+                        <li>Connect BI tools via HiveServer2</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>SQL-based data analysis</li>
+                        <li>Data warehousing on Hadoop</li>
+                        <li>Batch reporting and analytics</li>
+                        <li>ETL transformations</li>
+                        <li>Ad-hoc queries on large datasets</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Enterprise data warehouses</li>
+                        <li>Log analysis and reporting</li>
+                        <li>Customer analytics</li>
+                        <li>Business intelligence</li>
+                        <li>Historical data analysis</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>HiveQL: SQL-like query language</li>
+                        <li>Metastore: Stores schema metadata</li>
+                        <li>Partitioning: Improve query performance</li>
+                        <li>Bucketing: Data organization</li>
+                        <li>UDFs: Custom functions support</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Familiar SQL interface</li>
+                        <li>Integrates with BI tools</li>
+                        <li>Schema evolution support</li>
+                        <li>Handles petabyte-scale data</li>
+                        <li>Multiple execution engines</li>
+                        <li>Rich ecosystem of tools</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>High latency (batch-oriented)</li>
+                        <li>Not suitable for OLTP</li>
+                        <li>Limited real-time capabilities</li>
+                        <li>Performance tuning can be complex</li>
+                        <li>No support for row-level updates</li>
+                        <li>Slower than native Spark SQL</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. HBase -->
+        <div class="architecture" id="hbase">
+            <h2>🗄️ 7. Apache HBase Architecture</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    Client[Client API] --> ZK[ZooKeeper]
+    
+    ZK --> HMaster[HMaster]
+    
+    HMaster --> RS1[RegionServer 1]
+    HMaster --> RS2[RegionServer 2]
+    HMaster --> RS3[RegionServer 3]
+    
+    RS1 --> Region1[Region: Table A<br/>Rows 1-1000]
+    RS1 --> Region2[Region: Table B<br/>Rows 1-500]
+    
+    RS2 --> Region3[Region: Table A<br/>Rows 1001-2000]
+    RS2 --> Region4[Region: Table C]
+    
+    RS3 --> Region5[Region: Table B<br/>Rows 501-1000]
+    
+    RS1 --> HDFS1[(HDFS Blocks)]
+    RS2 --> HDFS2[(HDFS Blocks)]
+    RS3 --> HDFS3[(HDFS Blocks)]
+    
+    style HMaster fill:#2196F3
+    style RS1 fill:#FF9800
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is HBase?</h3>
+                    <p>Apache HBase is a distributed, column-oriented NoSQL database built on HDFS. It provides random, real-time read/write access to big data.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use HBase?</h3>
+                    <ul>
+                        <li>Real-time random access to big data</li>
+                        <li>Billions of rows, millions of columns</li>
+                        <li>Linear scalability</li>
+                        <li>Automatic sharding and rebalancing</li>
+                        <li>Strong consistency guarantees</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Design row key for access patterns</li>
+                        <li>Create tables with column families</li>
+                        <li>Use Put/Get/Scan operations</li>
+                        <li>Leverage filters for efficiency</li>
+                        <li>Monitor region distribution</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Need real-time random access</li>
+                        <li>Time-series data storage</li>
+                        <li>Sparse data with many columns</li>
+                        <li>Write-heavy workloads</li>
+                        <li>Key-value access patterns</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Time-series databases</li>
+                        <li>User profile storage</li>
+                        <li>Message/chat applications</li>
+                        <li>Real-time analytics</li>
+                        <li>IoT sensor data storage</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Column-family oriented storage</li>
+                        <li>Automatic region splitting</li>
+                        <li>Strong consistency model</li>
+                        <li>Versioning support (timestamps)</li>
+                        <li>Compression and block cache</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Low-latency random access</li>
+                        <li>Handles billions of rows</li>
+                        <li>Automatic sharding and rebalancing</li>
+                        <li>Strong consistency</li>
+                        <li>Built on HDFS (durability)</li>
+                        <li>Horizontal scalability</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Complex to operate and tune</li>
+                        <li>No SQL interface (NoSQL only)</li>
+                        <li>Row key design critical for performance</li>
+                        <li>Limited secondary index support</li>
+                        <li>Higher operational complexity</li>
+                        <li>Requires ZooKeeper dependency</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. Flume -->
+        <div class="architecture" id="flume">
+            <h2>📥 8. Apache Flume Data Ingestion</h2>
+            
+            <pre class="mermaid">
+flowchart LR
+    Source1[Web Server Logs] --> FlumeAgent1[Flume Agent 1]
+    Source2[Syslog] --> FlumeAgent1
+    Source3[Custom App] --> FlumeAgent2[Flume Agent 2]
+    
+    subgraph "Agent 1"
+        A1S[Source] --> A1C[Memory Channel]
+        A1C --> A1SI[Sink: HDFS]
+    end
+    
+    subgraph "Agent 2"
+        A2S[Source] --> A2C[File Channel]
+        A2C --> A2SI[Sink: Kafka]
+    end
+    
+    A1SI --> HDFS[(HDFS<br/>/logs/web/)]
+    A2SI --> KF[Kafka Topic]
+    
+    KF --> Consumer[Spark Streaming]
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Flume?</h3>
+                    <p>Apache Flume is a distributed service for efficiently collecting, aggregating, and moving large amounts of streaming data (especially logs) into HDFS or other sinks.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Flume?</h3>
+                    <ul>
+                        <li>Reliable log collection and aggregation</li>
+                        <li>Horizontal scalability</li>
+                        <li>Configurable reliability guarantees</li>
+                        <li>Multiple source/sink options</li>
+                        <li>Built-in fault tolerance</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Configure agents with sources, channels, sinks</li>
+                        <li>Chain agents for multi-tier collection</li>
+                        <li>Choose channel type (memory vs file)</li>
+                        <li>Set batch sizes for efficiency</li>
+                        <li>Monitor agent health and throughput</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Collecting logs from distributed systems</li>
+                        <li>Streaming data to Hadoop/HDFS</li>
+                        <li>Fan-in/fan-out data flows</li>
+                        <li>Need for reliable data delivery</li>
+                        <li>Time-based or size-based batching</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Web server log aggregation</li>
+                        <li>Application event streaming</li>
+                        <li>Click-stream data collection</li>
+                        <li>Sensor data ingestion</li>
+                        <li>Social media feed collection</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Source: Data input (Avro, Spooldir, HTTP)</li>
+                        <li>Channel: Buffering (Memory, File)</li>
+                        <li>Sink: Data output (HDFS, Kafka, HBase)</li>
+                        <li>Interceptors: Data transformation</li>
+                        <li>Multi-hop flows supported</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Reliable data delivery</li>
+                        <li>Flexible architecture</li>
+                        <li>Scalable horizontally</li>
+                        <li>Multiple sources and sinks</li>
+                        <li>Easy configuration</li>
+                        <li>Built-in failover</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Limited data transformation capabilities</li>
+                        <li>Memory channel = potential data loss</li>
+                        <li>File channel = slower performance</li>
+                        <li>Configuration can become complex</li>
+                        <li>No built-in exactly-once semantics</li>
+                        <li>Being replaced by Kafka in many scenarios</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. Sqoop -->
+        <div class="architecture" id="sqoop">
+            <h2>🔀 9. Apache Sqoop Data Transfer</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    RDBMS1[(MySQL)] --> Sqoop1[Sqoop Import]
+    RDBMS2[(Oracle)] --> Sqoop2[Sqoop Import]
+    RDBMS3[(PostgreSQL)] --> Sqoop3[Sqoop Import]
+    
+    Sqoop1 --> MR1[MapReduce Job]
+    Sqoop2 --> MR2[MapReduce Job]
+    Sqoop3 --> MR3[MapReduce Job]
+    
+    MR1 --> HDFS1[(HDFS<br/>/data/mysql/)]
+    MR2 --> HDFS2[(HDFS<br/>/data/oracle/)]
+    MR3 --> HDFS3[(HDFS<br/>/data/postgres/)]
+    
+    HDFS1 --> Hive[(Hive Tables)]
+    HDFS2 --> Hive
+    HDFS3 --> Hive
+    
+    HDFS1 --> HBase[HBase]
+    
+    style Sqoop1 fill:#3F51B5
+    style HDFS1 fill:#4CAF50
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Sqoop?</h3>
+                    <p>Apache Sqoop is a tool for efficiently transferring bulk data between Hadoop (HDFS) and structured data stores like relational databases (RDBMS).</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Sqoop?</h3>
+                    <ul>
+                        <li>Parallel data import/export</li>
+                        <li>Automatic code generation</li>
+                        <li>Incremental imports</li>
+                        <li>Direct Hive/HBase integration</li>
+                        <li>Compression support</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Import: <code>sqoop import --connect jdbc:... --table users</code></li>
+                        <li>Export: <code>sqoop export --connect jdbc:... --export-dir /data</code></li>
+                        <li>Specify mappers for parallelism</li>
+                        <li>Use incremental mode for updates</li>
+                        <li>Direct connectors for performance</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Migrating data to Hadoop</li>
+                        <li>Regular ETL from RDBMS to HDFS</li>
+                        <li>Exporting processed data back to DB</li>
+                        <li>Incremental data synchronization</li>
+                        <li>Data warehouse loading</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Data lake ingestion from RDBMS</li>
+                        <li>Legacy system integration</li>
+                        <li>ETL pipeline data transfer</li>
+                        <li>Analytical database loading</li>
+                        <li>Backup and archival processes</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Uses MapReduce for parallel transfer</li>
+                        <li>JDBC connectivity to databases</li>
+                        <li>Split-by column for parallelism</li>
+                        <li>Boundary query optimization</li>
+                        <li>Free-form query support</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Parallel data transfer (fast)</li>
+                        <li>Automatic code generation</li>
+                        <li>Incremental import support</li>
+                        <li>Direct RDBMS connectors</li>
+                        <li>Compression and partitioning</li>
+                        <li>Integration with Hive/HBase</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Can impact source database performance</li>
+                        <li>Complex for non-uniform data</li>
+                        <li>Limited transformation capabilities</li>
+                        <li>Requires JDBC drivers</li>
+                        <li>No real-time streaming</li>
+                        <li>Development has slowed (Sqoop2 discontinued)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. ZooKeeper -->
+        <div class="architecture" id="zookeeper">
+            <h2>🕸️ 10. Apache ZooKeeper Ensemble</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    Client1[Client App 1] --> ZK1[ZooKeeper Server 1<br/>Follower]
+    Client2[Client App 2] --> ZK2[ZooKeeper Server 2<br/>Leader]
+    Client3[Client App 3] --> ZK3[ZooKeeper Server 3<br/>Follower]
+    
+    ZK1 <--> ZK2
+    ZK2 <--> ZK3
+    ZK1 <--> ZK3
+    
+    subgraph "Ensemble"
+        ZK1
+        ZK2
+        ZK3
+    end
+    
+    ZK2 -->|Manages| Hadoop[Hadoop Cluster]
+    ZK2 -->|Coordinates| Kafka[Kafka Brokers]
+    ZK2 -->|Elects| HBase[HBase Master]
+    
+    style ZK2 fill:#FF9800
+    style ZK1 fill:#9E9E9E
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is ZooKeeper?</h3>
+                    <p>Apache ZooKeeper is a centralized coordination service for distributed applications. It provides distributed configuration, synchronization, and naming services.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use ZooKeeper?</h3>
+                    <ul>
+                        <li>Centralized configuration management</li>
+                        <li>Distributed locking and synchronization</li>
+                        <li>Leader election for HA</li>
+                        <li>Service discovery</li>
+                        <li>Group membership management</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Setup ensemble (odd number of nodes)</li>
+                        <li>Create znodes (data nodes)</li>
+                        <li>Set watches for notifications</li>
+                        <li>Use sessions for client connections</li>
+                        <li>Implement coordination patterns</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Need for distributed coordination</li>
+                        <li>Configuration management across cluster</li>
+                        <li>Leader election requirements</li>
+                        <li>Distributed locks needed</li>
+                        <li>Service discovery for microservices</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Hadoop ecosystem (HBase, Kafka)</li>
+                        <li>Distributed application coordination</li>
+                        <li>Configuration management systems</li>
+                        <li>Service registry and discovery</li>
+                        <li>Cluster membership management</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Ensemble: Cluster of ZK servers</li>
+                        <li>Quorum: Majority required for operations</li>
+                        <li>Znodes: File-system-like hierarchy</li>
+                        <li>Watches: Notifications on changes</li>
+                        <li>Sequential consistency guaranteed</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Highly reliable and consistent</li>
+                        <li>Simple API for coordination</li>
+                        <li>Fast reads (in-memory)</li>
+                        <li>Automatic failover</li>
+                        <li>Watch mechanism for notifications</li>
+                        <li>Battle-tested in production</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Not designed for large data storage</li>
+                        <li>Write performance limited by quorum</li>
+                        <li>Complex to operate and debug</li>
+                        <li>Single point of coordination</li>
+                        <li>Limited to 1MB per znode</li>
+                        <li>Being replaced in some systems (e.g., Kafka)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11. Oozie -->
+        <div class="architecture" id="oozie">
+            <h2>🔄 11. Apache Oozie Workflow</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    Start([Start]) --> SqoopJob[Sqoop Import]
+    
+    SqoopJob --> HiveJob[Hive ETL Job]
+    
+    HiveJob --> Decision{Data Quality Check?}
+    
+    Decision -->|Pass| SparkJob[Spark ML Job]
+    Decision -->|Fail| EmailAlert[Email Alert]
+    
+    SparkJob --> HBaseLoad[Load to HBase]
+    
+    HBaseLoad --> End([End])
+    EmailAlert --> End
+    
+    style SqoopJob fill:#2196F3
+    style HiveJob fill:#4CAF50
+    style SparkJob fill:#FF9800
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Oozie?</h3>
+                    <p>Apache Oozie is a workflow scheduler system to manage Hadoop jobs. It combines multiple jobs sequentially into one logical unit of work with support for MapReduce, Pig, Hive, Sqoop, and Spark.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Oozie?</h3>
+                    <ul>
+                        <li>Orchestrate complex Hadoop workflows</li>
+                        <li>Schedule jobs with time/data dependencies</li>
+                        <li>Manage job dependencies (DAG)</li>
+                        <li>Built-in error handling and retry</li>
+                        <li>Coordinator for recurring jobs</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Define workflow in XML</li>
+                        <li>Specify actions (Map-Reduce, Hive, etc.)</li>
+                        <li>Set up control flow (decision, fork, join)</li>
+                        <li>Configure coordinator for scheduling</li>
+                        <li>Monitor via Oozie web console</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Complex multi-step ETL pipelines</li>
+                        <li>Scheduled batch processing</li>
+                        <li>Dependency management needed</li>
+                        <li>Data-driven workflow execution</li>
+                        <li>Automated data pipeline orchestration</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>ETL pipeline automation</li>
+                        <li>Periodic report generation</li>
+                        <li>Data warehouse loading</li>
+                        <li>Multi-stage data processing</li>
+                        <li>Batch job orchestration</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Workflow: DAG of actions</li>
+                        <li>Coordinator: Time-based scheduling</li>
+                        <li>Bundle: Group of coordinators</li>
+                        <li>Actions: MapReduce, Hive, Pig, Spark</li>
+                        <li>Control nodes: Fork, join, decision</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Native Hadoop integration</li>
+                        <li>Complex workflow support (DAG)</li>
+                        <li>Built-in retry and error handling</li>
+                        <li>Time and data-based triggers</li>
+                        <li>Reusable workflow definitions</li>
+                        <li>Web UI for monitoring</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>XML-based configuration (verbose)</li>
+                        <li>Steep learning curve</li>
+                        <li>Limited debugging capabilities</li>
+                        <li>Not suitable for streaming workflows</li>
+                        <li>Being replaced by Airflow in many cases</li>
+                        <li>Limited community support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12. Security -->
+        <div class="architecture" id="security">
+            <h2>🛡️ 12. Security Layer (Kerberos + Ranger)</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    User[User] --> Kerberos[Kerberos KDC]
+    
+    Kerberos --> TGT[Ticket Granting Ticket]
+    
+    TGT --> Service1[HDFS Service]
+    TGT --> Service2[Hive Service]
+    TGT --> Service3[Spark Service]
+    
+    Service1 --> Ranger[Ranger Policy Server]
+    Service2 --> Ranger
+    Service3 --> Ranger
+    
+    Ranger --> PolicyDB[(Policy Database)]
+    
+    Ranger --> Audit[Audit Logs]
+    
+    subgraph "Enforcement Points"
+        Service1
+        Service2
+        Service3
+    end
+    
+    style Kerberos fill:#3F51B5
+    style Ranger fill:#F44336
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Hadoop Security?</h3>
+                    <p>Hadoop security combines Kerberos for authentication and Apache Ranger for authorization, providing enterprise-grade access control, auditing, and data governance.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Security?</h3>
+                    <ul>
+                        <li>Protect sensitive enterprise data</li>
+                        <li>Compliance with regulations (GDPR, HIPAA)</li>
+                        <li>Role-based access control (RBAC)</li>
+                        <li>Comprehensive audit trails</li>
+                        <li>Multi-tenancy support</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Setup Kerberos KDC</li>
+                        <li>Configure principals for users/services</li>
+                        <li>Install and configure Ranger</li>
+                        <li>Define policies in Ranger UI</li>
+                        <li>Enable encryption (TLS, at-rest)</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Enterprise production environments</li>
+                        <li>Sensitive data handling</li>
+                        <li>Regulatory compliance needed</li>
+                        <li>Multi-tenant clusters</li>
+                        <li>Audit requirements</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Financial services data platforms</li>
+                        <li>Healthcare data lakes</li>
+                        <li>Government systems</li>
+                        <li>Enterprise data warehouses</li>
+                        <li>PII/PCI data storage</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Kerberos: Ticket-based authentication</li>
+                        <li>Ranger: Centralized authorization</li>
+                        <li>Encryption: In-transit and at-rest</li>
+                        <li>Auditing: All access logged</li>
+                        <li>Policy-based access control</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Strong authentication (Kerberos)</li>
+                        <li>Fine-grained access control</li>
+                        <li>Comprehensive audit logging</li>
+                        <li>Centralized policy management</li>
+                        <li>Compliance support</li>
+                        <li>Integration with enterprise systems (LDAP/AD)</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Complex setup and configuration</li>
+                        <li>Performance overhead</li>
+                        <li>Operational complexity increases</li>
+                        <li>Kerberos can be difficult to troubleshoot</li>
+                        <li>Requires infrastructure (KDC, Ranger)</li>
+                        <li>Learning curve for administrators</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 13. Monitoring -->
+        <div class="architecture" id="monitoring">
+            <h2>📊 13. Monitoring Dashboard (Ambari)</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    Ambari[Ambari Server] --> Metrics[Metrics Collector]
+    
+    Metrics --> HDFS_M[HDFS Metrics]
+    Metrics --> YARN_M[YARN Metrics]
+    Metrics --> HBase_M[HBase Metrics]
+    
+    HDFS_M --> Dash1[Dashboard: HDFS Health]
+    YARN_M --> Dash2[Dashboard: Cluster Utilization]
+    HBase_M --> Dash3[Dashboard: HBase Performance]
+    
+    Dash1 --> Alert1[Alerts: Low Disk]
+    Dash2 --> Alert2[Alerts: High CPU]
+    Dash3 --> Alert3[Alerts: Region Server Down]
+    
+    Alert1 --> Action1[Auto-add Nodes]
+    Alert2 --> Action2[Scale Down]
+    Alert3 --> Action3[Notify Admin]
+    
+    style Ambari fill:#00BCD4
+    style Alert1 fill:#FF5722
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Cluster Monitoring?</h3>
+                    <p>Cluster monitoring provides visibility into Hadoop ecosystem health, performance, and resource utilization using tools like Ambari, Cloudera Manager, or Prometheus/Grafana.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Monitoring?</h3>
+                    <ul>
+                        <li>Proactive issue detection</li>
+                        <li>Performance optimization</li>
+                        <li>Capacity planning</li>
+                        <li>SLA compliance tracking</li>
+                        <li>Root cause analysis</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Install monitoring agents on nodes</li>
+                        <li>Configure metrics collection</li>
+                        <li>Setup dashboards for visualization</li>
+                        <li>Define alerts and thresholds</li>
+                        <li>Integrate with notification systems</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Production cluster operations</li>
+                        <li>Performance tuning needed</li>
+                        <li>SLA requirements</li>
+                        <li>Resource planning</li>
+                        <li>Troubleshooting and debugging</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>All production Hadoop clusters</li>
+                        <li>Mission-critical data pipelines</li>
+                        <li>Large-scale deployments</li>
+                        <li>Multi-tenant environments</li>
+                        <li>Cloud and on-premise clusters</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Metrics: CPU, memory, disk, network</li>
+                        <li>Service health: Up/down status</li>
+                        <li>Alerts: Configurable thresholds</li>
+                        <li>Dashboards: Real-time visualization</li>
+                        <li>Historical data: Trend analysis</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Proactive issue detection</li>
+                        <li>Reduced downtime</li>
+                        <li>Performance optimization insights</li>
+                        <li>Historical trend analysis</li>
+                        <li>Automated alerting</li>
+                        <li>Centralized visibility</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Resource overhead for collection</li>
+                        <li>Alert fatigue if not tuned</li>
+                        <li>Learning curve for tools</li>
+                        <li>Storage requirements for metrics</li>
+                        <li>Potential performance impact</li>
+                        <li>Requires maintenance and updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 14. Data Lake -->
+        <div class="architecture" id="datalake">
+            <h2>🌐 14. Data Lake Architecture</h2>
+            
+            <pre class="mermaid">
+flowchart LR
+    subgraph "Ingestion Zone"
+        I1[Kafka Streams]
+        I2[Flume Agents]
+        I3[Sqoop Jobs]
+    end
+    
+    subgraph "Raw Zone"
+        R1[(HDFS: /raw/logs)]
+        R2[(HDFS: /raw/db)]
+        R3[(HDFS: /raw/iot)]
+    end
+    
+    subgraph "Processed Zone"
+        P1[(HDFS: /processed/cleaned)]
+        P2[(HDFS: /processed/aggregated)]
+        P3[(ORC/Parquet)]
+    end
+    
+    subgraph "Serving Zone"
+        S1[Hive Tables]
+        S2[HBase Tables]
+        S3[Kafka Topics]
+    end
+    
+    I1 --> R1
+    I2 --> R2
+    I3 --> R3
+    
+    R1 --> ETL1[Spark ETL]
+    R2 --> ETL2[Hive ETL]
+    R3 --> ETL3[Pig Scripts]
+    
+    ETL1 --> P1
+    ETL2 --> P2
+    ETL3 --> P3
+    
+    P1 --> S1
+    P2 --> S2
+    P3 --> S3
+    
+    S1 --> Consumers[BI Tools, APIs]
+    S2 --> Consumers
+    S3 --> Consumers
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Data Lake?</h3>
+                    <p>A Data Lake is a centralized repository that stores all structured and unstructured data at any scale. It follows a multi-zone architecture: Raw (Bronze), Processed (Silver), and Serving (Gold).</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Data Lake?</h3>
+                    <ul>
+                        <li>Store all data types in native format</li>
+                        <li>Schema-on-read flexibility</li>
+                        <li>Cost-effective storage</li>
+                        <li>Support for advanced analytics</li>
+                        <li>Single source of truth</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Design zone-based architecture</li>
+                        <li>Implement data governance policies</li>
+                        <li>Setup metadata catalog</li>
+                        <li>Define data quality processes</li>
+                        <li>Establish access controls</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Diverse data sources and types</li>
+                        <li>Unknown future use cases</li>
+                        <li>Advanced analytics requirements</li>
+                        <li>Machine learning initiatives</li>
+                        <li>Long-term data retention</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Enterprise data platforms</li>
+                        <li>IoT data collection</li>
+                        <li>Customer 360 initiatives</li>
+                        <li>Regulatory data retention</li>
+                        <li>AI/ML model training</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Bronze: Raw ingestion (immutable)</li>
+                        <li>Silver: Cleaned and validated</li>
+                        <li>Gold: Business-ready aggregates</li>
+                        <li>Data cataloging essential</li>
+                        <li>Governance prevents data swamps</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Stores all data (structured/unstructured)</li>
+                        <li>Schema flexibility</li>
+                        <li>Cost-effective storage</li>
+                        <li>Supports diverse analytics</li>
+                        <li>Scalable architecture</li>
+                        <li>Enables data exploration</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Can become data swamp without governance</li>
+                        <li>Complex data quality management</li>
+                        <li>Performance challenges for queries</li>
+                        <li>Requires strong cataloging</li>
+                        <li>Security and compliance complexity</li>
+                        <li>Risk of storing unused data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15. Lambda Architecture -->
+        <div class="architecture" id="lambda">
+            <h2>🔁 15. Lambda Architecture</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    Stream[Data Stream] --> SpeedLayer[Speed Layer]
+    Stream --> BatchLayer[Batch Layer]
+    
+    subgraph "Speed Layer (Real-time)"
+        Kafka[Kafka] --> SparkStreaming[Spark Streaming]
+        SparkStreaming --> SpeedView[Real-time Views]
+    end
+    
+    subgraph "Batch Layer"
+        HDFS[(HDFS Raw Data)] --> BatchProcessing[Batch Processing]
+        BatchProcessing --> BatchView[Batch Views]
+    end
+    
+    SpeedView --> ServingLayer[Serving Layer]
+    BatchView --> ServingLayer
+    
+    ServingLayer --> Query[Query Interface]
+    
+    Query --> Results[Results]
+    
+    style SpeedLayer fill:#FF9800
+    style BatchLayer fill:#2196F3
+    style ServingLayer fill:#4CAF50
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Lambda Architecture?</h3>
+                    <p>Lambda Architecture combines batch and real-time stream processing to provide both accurate historical analysis and low-latency updates. It uses three layers: Batch, Speed, and Serving.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Lambda?</h3>
+                    <ul>
+                        <li>Balance between latency and accuracy</li>
+                        <li>Fault tolerance (batch corrects errors)</li>
+                        <li>Comprehensive data views</li>
+                        <li>Handle late-arriving data</li>
+                        <li>Reprocessing capabilities</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Implement batch layer for accuracy</li>
+                        <li>Build speed layer for real-time</li>
+                        <li>Create serving layer to merge views</li>
+                        <li>Handle duplicate processing</li>
+                        <li>Manage two codebases (batch + stream)</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Need both real-time and batch analytics</li>
+                        <li>Accuracy critical for decisions</li>
+                        <li>Handle out-of-order data</li>
+                        <li>Reprocessing requirements</li>
+                        <li>Complex event processing</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Real-time dashboards with history</li>
+                        <li>Financial transaction processing</li>
+                        <li>IoT analytics platforms</li>
+                        <li>Fraud detection systems</li>
+                        <li>Customer behavior analysis</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Batch: Comprehensive, accurate views</li>
+                        <li>Speed: Low-latency approximate views</li>
+                        <li>Serving: Merges both layers</li>
+                        <li>Eventual consistency model</li>
+                        <li>Immutable data principle</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Both real-time and accurate results</li>
+                        <li>Fault-tolerant (batch corrects errors)</li>
+                        <li>Reprocessing capability</li>
+                        <li>Handles late data gracefully</li>
+                        <li>Proven architecture pattern</li>
+                        <li>Scalable independently</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Complex to build and maintain</li>
+                        <li>Two codebases to manage</li>
+                        <li>Higher operational cost</li>
+                        <li>Data synchronization challenges</li>
+                        <li>Duplicate logic in batch and speed</li>
+                        <li>Being replaced by Kappa in some cases</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 16. Spark Streaming -->
+        <div class="architecture" id="streaming">
+            <h2>🚀 16. Spark Streaming Architecture</h2>
+            
+            <pre class="mermaid">
+flowchart LR
+    Sources --> SparkStreaming[Spark Streaming Context]
+    
+    subgraph Sources
+        KFK[Kafka]
+        FLM[Flume]
+        SOCK[TCP Socket]
+    end
+    
+    SparkStreaming --> DStream[DStream<br/>Micro-batches]
+    
+    DStream --> Transformations[Transformations<br/>map, filter, reduceByKey]
+    
+    Transformations --> Output[Output Operations]
+    
+    subgraph Output
+        HDFS_Out[(Save to HDFS)]
+        DB_Out[Write to DB]
+        DASH[Update Dashboard]
+    end
+    
+    SparkStreaming --> Checkpoint[(Checkpoint Directory)]
+    
+    style SparkStreaming fill:#FF5722
+    style DStream fill:#FF9800
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Spark Streaming?</h3>
+                    <p>Spark Streaming is an extension of Apache Spark for scalable, high-throughput, fault-tolerant stream processing of live data streams using micro-batch processing model.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Spark Streaming?</h3>
+                    <ul>
+                        <li>Near real-time stream processing</li>
+                        <li>Integration with Spark ecosystem (SQL, ML)</li>
+                        <li>Exactly-once semantics</li>
+                        <li>Windowed operations support</li>
+                        <li>Stateful processing capabilities</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Create StreamingContext with batch interval</li>
+                        <li>Define input DStreams from sources</li>
+                        <li>Apply transformations (map, reduce, join)</li>
+                        <li>Define output operations</li>
+                        <li>Enable checkpointing for fault tolerance</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Real-time analytics (seconds latency OK)</li>
+                        <li>Complex stateful processing</li>
+                        <li>Integration with Spark ML needed</li>
+                        <li>Windowed aggregations</li>
+                        <li>Combining streaming with batch</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Real-time ETL pipelines</li>
+                        <li>Live dashboards and monitoring</li>
+                        <li>Clickstream analysis</li>
+                        <li>Fraud detection systems</li>
+                        <li>Social media sentiment analysis</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>DStream: Discretized Stream (micro-batches)</li>
+                        <li>Batch interval: Typically 1-10 seconds</li>
+                        <li>Windowing: Tumbling and sliding windows</li>
+                        <li>Checkpointing: Metadata and data</li>
+                        <li>Stateful operations: updateStateByKey</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Unified batch and streaming API</li>
+                        <li>Exactly-once processing semantics</li>
+                        <li>Integration with Spark ecosystem</li>
+                        <li>High throughput</li>
+                        <li>Fault-tolerant with checkpointing</li>
+                        <li>Rich transformation operations</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Latency in seconds (not milliseconds)</li>
+                        <li>Micro-batch overhead</li>
+                        <li>Memory-intensive</li>
+                        <li>Complex for true event-time processing</li>
+                        <li>Being replaced by Structured Streaming</li>
+                        <li>Checkpointing can impact performance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 17. ML Pipeline -->
+        <div class="architecture" id="ml">
+            <h2>🧠 17. ML Pipeline with Spark MLlib</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    Data[(HDFS Data)] --> Preprocess[Preprocessing]
+    
+    Preprocess --> Split[Train/Test Split]
+    
+    Split --> ModelTraining[Model Training]
+    
+    ModelTraining --> ModelEval[Model Evaluation]
+    
+    ModelEval --> Decision{Accuracy > Threshold?}
+    
+    Decision -->|Yes| ModelSave[Save Model]
+    Decision -->|No| HyperTune[Hyperparameter Tuning]
+    
+    HyperTune --> ModelTraining
+    
+    ModelSave --> Registry[Model Registry]
+    
+    Registry --> Deployment[Deploy to Serving]
+    
+    Deployment --> Predictions[Real-time Predictions]
+    
+    style ModelTraining fill:#9C27B0
+    style Deployment fill:#4CAF50
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is ML Pipeline?</h3>
+                    <p>An ML Pipeline automates the workflow of building, training, evaluating, and deploying machine learning models at scale using frameworks like Spark MLlib for distributed computing.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use ML Pipeline?</h3>
+                    <ul>
+                        <li>Automate repetitive ML tasks</li>
+                        <li>Ensure reproducibility</li>
+                        <li>Scale to massive datasets</li>
+                        <li>Version control for models</li>
+                        <li>Streamline deployment</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Load data from HDFS/S3</li>
+                        <li>Create feature transformation pipeline</li>
+                        <li>Split data for training/validation</li>
+                        <li>Train models with MLlib algorithms</li>
+                        <li>Evaluate and tune hyperparameters</li>
+                        <li>Deploy to production serving</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Large-scale ML projects</li>
+                        <li>Batch prediction requirements</li>
+                        <li>Feature engineering at scale</li>
+                        <li>Model retraining needed</li>
+                        <li>Distributed ML workloads</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Recommendation systems</li>
+                        <li>Fraud detection models</li>
+                        <li>Customer churn prediction</li>
+                        <li>Image/text classification</li>
+                        <li>Predictive maintenance</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Pipeline: Transformers + Estimators</li>
+                        <li>Feature engineering: VectorAssembler, etc.</li>
+                        <li>Algorithms: Classification, regression, clustering</li>
+                        <li>Cross-validation: Grid/random search</li>
+                        <li>Model persistence: Save/load models</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Scales to billions of records</li>
+                        <li>Distributed training</li>
+                        <li>Integration with Spark ecosystem</li>
+                        <li>Pipeline abstraction (reusable)</li>
+                        <li>Built-in cross-validation</li>
+                        <li>Support for various algorithms</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>Limited deep learning support</li>
+                        <li>Not as feature-rich as scikit-learn</li>
+                        <li>Memory-intensive for large models</li>
+                        <li>Learning curve for distributed ML</li>
+                        <li>Slower iteration vs single-node</li>
+                        <li>Debugging can be challenging</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 18. Complete Ecosystem -->
+        <div class="architecture" id="ecosystem">
+            <h2>🌉 18. Complete Big Data Ecosystem</h2>
+            
+            <pre class="mermaid">
+flowchart TD
+    subgraph "Data Sources"
+        DS1[IoT Devices]
+        DS2[Web Logs]
+        DS3[RDBMS]
+        DS4[Social Media]
+        DS5[Sensors]
+    end
+    
+    subgraph "Ingestion Layer"
+        IN1[Kafka<br/>Real-time Streams]
+        IN2[Flume<br/>Log Aggregation]
+        IN3[Sqoop<br/>DB Transfer]
+    end
+    
+    subgraph "Storage Layer"
+        ST1[(HDFS<br/>Distributed Storage)]
+        ST2[(HBase<br/>NoSQL DB)]
+        ST3[(S3/Cloud<br/>Object Storage)]
+    end
+    
+    subgraph "Processing Layer"
+        PR1[Spark<br/>In-memory Processing]
+        PR2[MapReduce<br/>Batch Processing]
+        PR3[Hive<br/>SQL Engine]
+        PR4[Pig<br/>ETL Scripting]
+    end
+    
+    subgraph "Analytics Layer"
+        AN1[Spark SQL]
+        AN2[Impala]
+        AN3[Spark MLlib]
+        AN4[Custom Apps]
+    end
+    
+    subgraph "Orchestration & Coordination"
+        OC1[Oozie<br/>Workflow Scheduler]
+        OC2[Airflow<br/>Pipeline Orchestration]
+        OC3[ZooKeeper<br/>Coordination]
+    end
+    
+    subgraph "Monitoring & Security"
+        MS1[Ambari/Cloudera Manager]
+        MS2[Kerberos/Ranger]
+        MS3[Grafana/Prometheus]
+    end
+    
+    DS1 --> IN1
+    DS2 --> IN2
+    DS3 --> IN3
+    DS4 --> IN1
+    DS5 --> IN2
+    
+    IN1 --> ST1
+    IN2 --> ST1
+    IN3 --> ST1
+    IN1 --> ST2
+    
+    ST1 --> PR1
+    ST1 --> PR2
+    ST1 --> PR3
+    ST2 --> PR1
+    
+    PR1 --> AN1
+    PR2 --> AN1
+    PR3 --> AN1
+    PR4 --> AN1
+    PR1 --> AN3
+    
+    AN1 --> Applications[BI Tools, Dashboards, APIs]
+    AN3 --> Applications
+    
+    OC1 --> PR1
+    OC1 --> PR2
+    OC1 --> PR3
+    OC2 --> IN1
+    OC2 --> IN2
+    
+    OC3 --> ST2
+    OC3 --> IN1
+    
+    MS1 -.->|Monitors| ST1
+    MS1 -.->|Monitors| PR1
+    MS2 -.->|Secures| ST1
+    MS2 -.->|Secures| PR1
+    MS3 -.->|Metrics| AN1
+    
+    style IN1 fill:#9C27B0
+    style ST1 fill:#2196F3
+    style PR1 fill:#FF9800
+    style AN1 fill:#4CAF50
+    style OC1 fill:#FF5722
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is the Big Data Ecosystem?</h3>
+                    <p>The Big Data Ecosystem is a comprehensive collection of tools and frameworks working together to ingest, store, process, analyze, and serve massive datasets across distributed systems.</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Complete Ecosystem?</h3>
+                    <ul>
+                        <li>End-to-end data platform</li>
+                        <li>Best-of-breed tool integration</li>
+                        <li>Flexibility for diverse workloads</li>
+                        <li>Scalability at every layer</li>
+                        <li>Comprehensive data lifecycle management</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Design architecture for use cases</li>
+                        <li>Select appropriate tools per layer</li>
+                        <li>Implement data governance</li>
+                        <li>Setup monitoring and security</li>
+                        <li>Establish operational procedures</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Enterprise data platform needs</li>
+                        <li>Multiple data sources and types</li>
+                        <li>Diverse analytical requirements</li>
+                        <li>Scalability is critical</li>
+                        <li>Long-term data strategy</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Enterprise data platforms</li>
+                        <li>Digital transformation initiatives</li>
+                        <li>Analytics and BI environments</li>
+                        <li>IoT data processing platforms</li>
+                        <li>AI/ML model training infrastructure</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Points</h3>
+                    <ul>
+                        <li>Layered architecture approach</li>
+                        <li>Component interoperability</li>
+                        <li>Horizontal scalability</li>
+                        <li>Fault tolerance at all layers</li>
+                        <li>Flexible tool selection</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>Comprehensive data platform</li>
+                        <li>Best tool for each task</li>
+                        <li>Proven at enterprise scale</li>
+                        <li>Strong community support</li>
+                        <li>Cloud and on-premise options</li>
+                        <li>Extensive ecosystem integration</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>High complexity to manage</li>
+                        <li>Steep learning curve</li>
+                        <li>Significant operational overhead</li>
+                        <li>Tool proliferation challenges</li>
+                        <li>Integration complexity</li>
+                        <li>Requires specialized expertise</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
