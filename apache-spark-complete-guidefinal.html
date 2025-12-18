@@ -1,0 +1,2438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Apache Spark Architecture Guide</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%);
+            line-height: 1.6;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 { 
+            text-align: center; 
+            color: #FF6B35; 
+            font-size: 2.8em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .architecture {
+            background: #f8f9fa;
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 12px;
+            border-left: 5px solid #FF6B35;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .architecture h2 { 
+            color: #2d3748;
+            border-bottom: 3px solid #FF6B35; 
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .mermaid { 
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .detail-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #FF6B35;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .detail-card h3 {
+            color: #FF6B35;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .detail-card p, .detail-card ul {
+            color: #4a5568;
+            font-size: 0.95em;
+        }
+        .detail-card ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .detail-card li {
+            margin: 5px 0;
+        }
+        .detail-card code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            color: #c7254e;
+        }
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .pros {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+        .cons {
+            background: #f8d7da;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #dc3545;
+        }
+        .pros h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        .cons h3 {
+            color: #721c24;
+            margin-bottom: 10px;
+        }
+        .pros ul, .cons ul {
+            margin-left: 20px;
+            color: #333;
+        }
+        .pros li, .cons li {
+            margin: 8px 0;
+        }
+        .best-practices {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2196F3;
+            margin: 25px 0;
+        }
+        .best-practices h3 {
+            color: #1565c0;
+            margin-bottom: 15px;
+        }
+        .best-practices ul {
+            margin-left: 20px;
+            color: #333;
+        }
+        .best-practices li {
+            margin: 8px 0;
+        }
+        .dos-donts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .dos {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4caf50;
+        }
+        .donts {
+            background: #ffebee;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #f44336;
+        }
+        .dos h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        .donts h3 {
+            color: #c62828;
+            margin-bottom: 10px;
+        }
+        .dos ul, .donts ul {
+            margin-left: 20px;
+            color: #333;
+        }
+        .dos li, .donts li {
+            margin: 8px 0;
+        }
+        .icon { font-size: 1.2em; }
+        .toc {
+            background: #fff3e0;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #FF6B35;
+        }
+        .toc h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        .toc ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
+        }
+        .toc a {
+            color: #FF6B35;
+            text-decoration: none;
+            padding: 8px;
+            display: block;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            font-weight: 500;
+        }
+        .toc a:hover {
+            background: #FF6B35;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .pros-cons, .dos-donts {
+                grid-template-columns: 1fr;
+            }
+            .details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Complete Apache Spark Architecture Guide</h1>
+        
+        <div class="toc">
+            <h2>📑 Table of Contents</h2>
+            <ul>
+                <li><a href="#overview">1. Spark Overview & Architecture</a></li>
+                <li><a href="#ecosystem">2. Spark Ecosystem Components</a></li>
+                <li><a href="#rdd">3. RDD & DAG Execution</a></li>
+                <li><a href="#cluster">4. Cluster Architecture</a></li>
+                <li><a href="#yarn">5. Spark on YARN</a></li>
+                <li><a href="#hdfs">6. Spark with HDFS</a></li>
+                <li><a href="#vs-mapreduce">7. Spark vs MapReduce</a></li>
+                <li><a href="#deployment">8. Deployment Modes</a></li>
+                <li><a href="#internals">9. Spark Internals & Catalyst</a></li>
+                <li><a href="#udfs">10. Custom UDFs</a></li>
+                <li><a href="#datasources">11. External Data Sources</a></li>
+                <li><a href="#cloud">12. Cloud Deployments</a></li>
+            </ul>
+        </div>
+
+        <!-- 1. Spark Overview & Architecture -->
+        <div class="architecture" id="overview">
+            <h2>⚡ 1. Apache Spark Overview & Architecture Flow</h2>
+            
+            <pre class="mermaid">
+flowchart TB
+    subgraph User["User Applications"]
+        App1[PySpark Application]
+        App2[Scala Application]
+        App3[Java Application]
+        App4[R Application]
+    end
+    
+    subgraph Driver["Driver Program"]
+        SC[SparkContext/<br/>SparkSession]
+        DAG[DAG Scheduler]
+        TS[Task Scheduler]
+    end
+    
+    subgraph CM["Cluster Manager"]
+        YARN[YARN/<br/>Mesos/<br/>Kubernetes/<br/>Standalone]
+    end
+    
+    subgraph Workers["Worker Nodes"]
+        direction TB
+        W1[Worker 1]
+        W2[Worker 2]
+        W3[Worker 3]
+        
+        subgraph E1["Executors"]
+            Ex1[Executor 1<br/>Cache<br/>Tasks]
+        end
+        
+        subgraph E2["Executors"]
+            Ex2[Executor 2<br/>Cache<br/>Tasks]
+        end
+        
+        subgraph E3["Executors"]
+            Ex3[Executor 3<br/>Cache<br/>Tasks]
+        end
+        
+        W1 --> E1
+        W2 --> E2
+        W3 --> E3
+    end
+    
+    App1 & App2 & App3 & App4 --> SC
+    SC --> DAG
+    DAG --> TS
+    TS <--> YARN
+    YARN <--> W1 & W2 & W3
+    
+    style SC fill:#FF6B35,color:#fff
+    style DAG fill:#F7931E,color:#fff
+    style YARN fill:#4CAF50,color:#fff
+    style Ex1 fill:#2196F3,color:#fff
+    style Ex2 fill:#2196F3,color:#fff
+    style Ex3 fill:#2196F3,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Apache Spark?</h3>
+                    <p>Apache Spark is an open-source, unified analytics engine designed for large-scale data processing and analysis. It provides high-performance in-memory computation, supports batch and stream processing, and offers developer-friendly APIs in multiple languages (Scala, Python, Java, R).</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Why Use Apache Spark?</h3>
+                    <ul>
+                        <li>10-100x faster than MapReduce for iterative algorithms</li>
+                        <li>In-memory computation eliminates repeated disk I/O</li>
+                        <li>Unified platform for batch, streaming, ML, and graph processing</li>
+                        <li>Expressive APIs in Python, Scala, Java, and R</li>
+                        <li>Fault-tolerant through RDD lineage tracking</li>
+                        <li>Scalable from local mode to thousands of nodes</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>How to Use?</h3>
+                    <ul>
+                        <li>Install Spark: <code>spark-submit --master yarn myapp.py</code></li>
+                        <li>Create SparkSession: <code>spark = SparkSession.builder.appName("App").getOrCreate()</code></li>
+                        <li>Load data: <code>df = spark.read.parquet("hdfs://path")</code></li>
+                        <li>Transform: <code>df.filter(...).groupBy(...).agg(...)</code></li>
+                        <li>Action: <code>df.show(), df.count(), df.write.save()</code></li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏰</span>When to Use?</h3>
+                    <ul>
+                        <li>Iterative machine learning algorithms</li>
+                        <li>Real-time stream processing requirements</li>
+                        <li>Complex ETL pipelines with multiple transformations</li>
+                        <li>Interactive data analysis and exploration</li>
+                        <li>Graph processing and network analytics</li>
+                        <li>When performance matters for large datasets</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📍</span>Where to Apply?</h3>
+                    <ul>
+                        <li>Real-time fraud detection systems</li>
+                        <li>Recommendation engines (Netflix, Uber)</li>
+                        <li>Log analysis and monitoring (Twitter)</li>
+                        <li>Financial risk modeling</li>
+                        <li>IoT sensor data processing</li>
+                        <li>Genomics and healthcare analytics</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Architectural Components</h3>
+                    <ul>
+                        <li><strong>Driver:</strong> Coordinates execution, maintains SparkContext</li>
+                        <li><strong>Cluster Manager:</strong> Allocates resources (YARN/Mesos/K8s)</li>
+                        <li><strong>Executors:</strong> Run tasks, cache data in memory</li>
+                        <li><strong>RDD:</strong> Immutable distributed dataset</li>
+                        <li><strong>DAG Scheduler:</strong> Optimizes execution plan</li>
+                        <li><strong>Task Scheduler:</strong> Assigns tasks to executors</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Pros</h3>
+                    <ul>
+                        <li>10-100x faster than MapReduce</li>
+                        <li>Unified engine for batch, streaming, ML, and graphs</li>
+                        <li>In-memory computation for speed</li>
+                        <li>Fault-tolerant through RDD lineage</li>
+                        <li>Easy-to-use APIs in multiple languages</li>
+                        <li>Active community and enterprise support</li>
+                        <li>Integrates with Hadoop ecosystem</li>
+                        <li>Supports SQL, streaming, ML, and graph workloads</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>❌ Cons</h3>
+                    <ul>
+                        <li>High memory requirements</li>
+                        <li>Expensive for small datasets</li>
+                        <li>Steep learning curve initially</li>
+                        <li>No built-in storage (relies on HDFS/S3)</li>
+                        <li>Window operations can be complex</li>
+                        <li>Requires careful tuning for optimal performance</li>
+                        <li>May spill to disk if memory insufficient</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices</h3>
+                <ul>
+                    <li><strong>Memory Management:</strong> Set executor memory to 75% of node memory, leaving 25% for OS/buffers</li>
+                    <li><strong>Partitioning:</strong> Use 2-3 partitions per CPU core for optimal parallelism</li>
+                    <li><strong>Caching:</strong> Cache/persist RDDs that are reused multiple times: <code>df.cache()</code></li>
+                    <li><strong>Broadcasting:</strong> Broadcast small lookup tables: <code>broadcast(small_df)</code></li>
+                    <li><strong>Data Formats:</strong> Use Parquet/ORC for columnar storage and compression</li>
+                    <li><strong>Avoid Shuffles:</strong> Minimize wide transformations (groupBy, join) when possible</li>
+                    <li><strong>Serialization:</strong> Use Kryo serialization for better performance</li>
+                    <li><strong>Dynamic Allocation:</strong> Enable for auto-scaling: <code>spark.dynamicAllocation.enabled=true</code></li>
+                    <li><strong>Monitoring:</strong> Use Spark UI (port 4040) to monitor job execution</li>
+                    <li><strong>Checkpointing:</strong> Checkpoint long lineage chains to avoid recomputation</li>
+                </ul>
+            </div>
+
+            <div class="dos-donts">
+                <div class="dos">
+                    <h3>✅ Do's</h3>
+                    <ul>
+                        <li>✓ Use DataFrame/Dataset API over RDD API</li>
+                        <li>✓ Cache DataFrames that are reused multiple times</li>
+                        <li>✓ Use <code>repartition()</code> before writing to optimize file sizes</li>
+                        <li>✓ Broadcast small dimension tables in joins</li>
+                        <li>✓ Use <code>explain()</code> to understand query plans</li>
+                        <li>✓ Monitor Spark UI for performance bottlenecks</li>
+                        <li>✓ Use predicate pushdown filters early</li>
+                        <li>✓ Enable speculative execution for straggler tasks</li>
+                        <li>✓ Use coalesce() instead of repartition() when reducing partitions</li>
+                        <li>✓ Set appropriate shuffle partitions: <code>spark.sql.shuffle.partitions</code></li>
+                    </ul>
+                </div>
+                <div class="donts">
+                    <h3>❌ Don'ts</h3>
+                    <ul>
+                        <li>✗ Don't use <code>collect()</code> on large datasets</li>
+                        <li>✗ Don't create too many small files (file proliferation)</li>
+                        <li>✗ Don't use UDFs when native Spark functions exist</li>
+                        <li>✗ Don't ignore data skew in joins/groupBy</li>
+                        <li>✗ Don't over-partition (too many tasks = overhead)</li>
+                        <li>✗ Don't cache everything (memory waste)</li>
+                        <li>✗ Don't use CartesianProduct unless absolutely necessary</li>
+                        <li>✗ Don't forget to unpersist cached data when done</li>
+                        <li>✗ Don't use Python UDFs for performance-critical paths</li>
+                        <li>✗ Don't run actions inside transformations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Spark Ecosystem -->
+        <div class="architecture" id="ecosystem">
+            <h2>🔧 2. Spark Ecosystem Components</h2>
+            
+            <pre class="mermaid">
+flowchart TB
+    subgraph Core["Spark Core Engine"]
+        RDD[RDD API]
+        Memory[In-Memory Computing]
+        DAG2[DAG Execution]
+    end
+    
+    subgraph Libraries["Spark Libraries"]
+        SQL[Spark SQL<br/>Structured Data]
+        Streaming[Spark Streaming<br/>Real-time Processing]
+        MLlib[MLlib<br/>Machine Learning]
+        GraphX[GraphX<br/>Graph Processing]
+    end
+    
+    subgraph Storage["Data Sources"]
+        HDFS2[HDFS]
+        S3[AWS S3]
+        Cassandra[Cassandra]
+        HBase2[HBase]
+        Kafka2[Kafka]
+    end
+    
+    Core --> Libraries
+    Libraries --> Storage
+    
+    style Core fill:#FF6B35,color:#fff
+    style SQL fill:#4CAF50,color:#fff
+    style Streaming fill:#2196F3,color:#fff
+    style MLlib fill:#9C27B0,color:#fff
+    style GraphX fill:#FF9800,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Spark Core</h3>
+                    <p><strong>Purpose:</strong> Foundation of Spark - provides task scheduling, memory management, fault recovery, and RDD abstraction.</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>Task scheduling and distribution</li>
+                        <li>Memory management and caching</li>
+                        <li>Fault tolerance through lineage</li>
+                        <li>I/O operations</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span>Spark SQL</h3>
+                    <p><strong>Purpose:</strong> Process structured data using SQL queries and DataFrames.</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>DataFrame and Dataset APIs</li>
+                        <li>SQL query support</li>
+                        <li>Catalyst optimizer</li>
+                        <li>Hive integration</li>
+                        <li>Parquet, ORC, JSON support</li>
+                    </ul>
+                    <p><strong>Use Case:</strong> ETL, data warehousing, BI analytics</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🌊</span>Spark Streaming</h3>
+                    <p><strong>Purpose:</strong> Process live data streams in near real-time.</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>Micro-batch processing</li>
+                        <li>DStream (Discretized Stream) API</li>
+                        <li>Structured Streaming API</li>
+                        <li>Kafka, Flume, Kinesis integration</li>
+                        <li>Exactly-once semantics</li>
+                    </ul>
+                    <p><strong>Use Case:</strong> Real-time fraud detection, log monitoring</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🤖</span>MLlib</h3>
+                    <p><strong>Purpose:</strong> Scalable machine learning library.</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>Classification & regression</li>
+                        <li>Clustering algorithms</li>
+                        <li>Collaborative filtering</li>
+                        <li>Dimensionality reduction</li>
+                        <li>Feature engineering pipeline</li>
+                    </ul>
+                    <p><strong>Use Case:</strong> Recommendation systems, predictive analytics</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🕸️</span>GraphX</h3>
+                    <p><strong>Purpose:</strong> Graph computation and network analytics.</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>Graph algorithms (PageRank, Connected Components)</li>
+                        <li>Graph operations (subgraph, join)</li>
+                        <li>Pregel API for iterative graph computation</li>
+                        <li>Integration with RDD API</li>
+                    </ul>
+                    <p><strong>Use Case:</strong> Social network analysis, fraud detection</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔗</span>Integration Points</h3>
+                    <ul>
+                        <li><strong>HDFS:</strong> Distributed file storage</li>
+                        <li><strong>YARN:</strong> Resource management</li>
+                        <li><strong>Hive:</strong> SQL metastore and queries</li>
+                        <li><strong>Kafka:</strong> Stream ingestion</li>
+                        <li><strong>HBase:</strong> NoSQL database access</li>
+                        <li><strong>Cassandra:</strong> Distributed database</li>
+                        <li><strong>S3:</strong> Cloud object storage</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices for Ecosystem Usage</h3>
+                <ul>
+                    <li><strong>Spark SQL:</strong> Use DataFrame over RDD for better optimization</li>
+                    <li><strong>Streaming:</strong> Use Structured Streaming over DStreams (deprecated)</li>
+                    <li><strong>MLlib:</strong> Use Pipeline API for reproducible ML workflows</li>
+                    <li><strong>GraphX:</strong> Use when graph algorithms are needed; otherwise use Spark SQL</li>
+                    <li><strong>Data Formats:</strong> Use Parquet for analytical workloads, Avro for streaming</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 3. RDD & DAG Execution -->
+        <div class="architecture" id="rdd">
+            <h2>🔄 3. RDD & DAG Execution Model</h2>
+            
+            <pre class="mermaid">
+flowchart LR
+    subgraph Input["Data Input"]
+        File[Input File]
+    end
+    
+    subgraph Transformations["Transformations (Lazy)"]
+        Map[map]
+        Filter[filter]
+        FlatMap[flatMap]
+        Join[join]
+        GroupBy[groupByKey]
+    end
+    
+    subgraph DAG3["DAG Execution Plan"]
+        Stage1[Stage 1<br/>Narrow Dependencies]
+        Stage2[Stage 2<br/>Wide Dependencies<br/>SHUFFLE]
+        Stage3[Stage 3<br/>Final Stage]
+    end
+    
+    subgraph Actions["Actions (Eager)"]
+        Collect[collect]
+        Count[count]
+        Save[saveAsTextFile]
+        Reduce[reduce]
+    end
+    
+    File --> Map
+    Map --> Filter
+    Filter --> FlatMap
+    FlatMap --> Join
+    Join --> GroupBy
+    
+    Map & Filter & FlatMap -.-> Stage1
+    Join & GroupBy -.-> Stage2
+    Stage1 --> Stage2
+    Stage2 --> Stage3
+    
+    Stage3 --> Collect & Count & Save & Reduce
+    
+    style File fill:#90CAF9
+    style Stage1 fill:#A5D6A7
+    style Stage2 fill:#FFCC80
+    style Stage3 fill:#CE93D8
+    style Collect fill:#FF6B35,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">📦</span>What is RDD?</h3>
+                    <p>Resilient Distributed Dataset (RDD) is Spark's fundamental data abstraction - an immutable, distributed collection of objects that can be processed in parallel across a cluster.</p>
+                    <p><strong>Key Properties:</strong></p>
+                    <ul>
+                        <li><strong>Resilient:</strong> Fault-tolerant through lineage</li>
+                        <li><strong>Distributed:</strong> Partitioned across cluster nodes</li>
+                        <li><strong>Dataset:</strong> Collection of data elements</li>
+                        <li><strong>Immutable:</strong> Cannot be changed once created</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔀</span>Transformations vs Actions</h3>
+                    <p><strong>Transformations (Lazy):</strong></p>
+                    <ul>
+                        <li>Create new RDD from existing</li>
+                        <li>Not executed immediately</li>
+                        <li>Examples: map, filter, flatMap, groupBy, join</li>
+                    </ul>
+                    <p><strong>Actions (Eager):</strong></p>
+                    <ul>
+                        <li>Trigger computation</li>
+                        <li>Return results or write to storage</li>
+                        <li>Examples: count, collect, reduce, save</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📈</span>DAG (Directed Acyclic Graph)</h3>
+                    <p>DAG represents the execution plan of transformations and actions.</p>
+                    <p><strong>How it Works:</strong></p>
+                    <ul>
+                        <li>Driver builds DAG from transformations</li>
+                        <li>DAG Scheduler divides into stages</li>
+                        <li>Stages separated by shuffle boundaries</li>
+                        <li>Each stage has multiple tasks</li>
+                        <li>Tasks executed in parallel on executors</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔄</span>Narrow vs Wide Transformations</h3>
+                    <p><strong>Narrow (No Shuffle):</strong></p>
+                    <ul>
+                        <li>Each parent partition → one child partition</li>
+                        <li>Examples: map, filter, union</li>
+                        <li>Fast, no network transfer</li>
+                    </ul>
+                    <p><strong>Wide (Shuffle Required):</strong></p>
+                    <ul>
+                        <li>Multiple parent partitions → child partitions</li>
+                        <li>Examples: groupBy, reduceByKey, join</li>
+                        <li>Expensive, network transfer needed</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💾</span>Persistence Levels</h3>
+                    <ul>
+                        <li><code>MEMORY_ONLY</code>: Store in memory, recompute if lost</li>
+                        <li><code>MEMORY_AND_DISK</code>: Spill to disk if memory full</li>
+                        <li><code>MEMORY_ONLY_SER</code>: Serialized in memory (space efficient)</li>
+                        <li><code>DISK_ONLY</code>: Store only on disk</li>
+                        <li><code>OFF_HEAP</code>: Store in off-heap memory (Tachyon/Alluxio)</li>
+                    </ul>
+                    <p><strong>Usage:</strong> <code>rdd.persist(StorageLevel.MEMORY_AND_DISK)</code></p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🛡️</span>Fault Tolerance Mechanism</h3>
+                    <p>Spark achieves fault tolerance through RDD lineage:</p>
+                    <ul>
+                        <li>Each RDD remembers its parent RDDs</li>
+                        <li>If partition is lost, recompute from parent</li>
+                        <li>No need for expensive replication</li>
+                        <li>Checkpointing available for long lineages</li>
+                        <li>Driver failure requires restart</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices for RDD & DAG</h3>
+                <ul>
+                    <li><strong>Use DataFrame/Dataset:</strong> Prefer over RDD for better optimization</li>
+                    <li><strong>Minimize Shuffles:</strong> Use <code>reduceByKey</code> instead of <code>groupByKey</code></li>
+                    <li><strong>Cache Wisely:</strong> Only cache RDDs used multiple times</li>
+                    <li><strong>Partition Properly:</strong> Repartition before expensive operations</li>
+                    <li><strong>Monitor DAG:</strong> Use Spark UI to identify bottlenecks</li>
+                    <li><strong>Checkpoint Long Lineages:</strong> Prevent stack overflow and speed recovery</li>
+                    <li><strong>Broadcast Small Data:</strong> Use <code>broadcast()</code> for lookup tables</li>
+                    <li><strong>Avoid Collect:</strong> Don't use <code>collect()</code> on large RDDs</li>
+                </ul>
+            </div>
+
+            <div class="dos-donts">
+                <div class="dos">
+                    <h3>✅ Do's</h3>
+                    <ul>
+                        <li>✓ Use <code>reduceByKey()</code> for aggregations</li>
+                        <li>✓ Cache RDDs that are reused</li>
+                        <li>✓ Use <code>mapPartitions()</code> for setup/teardown operations</li>
+                        <li>✓ Filter early to reduce data size</li>
+                        <li>✓ Use <code>coalesce()</code> to reduce partitions efficiently</li>
+                        <li>✓ Monitor shuffle read/write sizes</li>
+                    </ul>
+                </div>
+                <div class="donts">
+                    <h3>❌ Don'ts</h3>
+                    <ul>
+                        <li>✗ Don't use <code>groupByKey()</code> when <code>reduceByKey()</code> works</li>
+                        <li>✗ Don't create too many stages (lineage too long)</li>
+                        <li>✗ Don't ignore data skew in keys</li>
+                        <li>✗ Don't forget to unpersist cached RDDs</li>
+                        <li>✗ Don't use too many or too few partitions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Cluster Architecture -->
+        <div class="architecture" id="cluster">
+            <h2>🖥️ 4. Spark Cluster Architecture</h2>
+            
+            <pre class="mermaid">
+flowchart TB
+    subgraph Client["Client Machine"]
+        SparkSubmit[spark-submit<br/>Application]
+    end
+    
+    subgraph Driver2["Driver Node"]
+        SC2[SparkContext]
+        DAG4[DAG Scheduler]
+        TaskSched[Task Scheduler]
+        UI[Spark UI :4040]
+    end
+    
+    subgraph CM2["Cluster Manager"]
+        ResManager[Resource Manager<br/>YARN/Mesos/K8s]
+    end
+    
+    subgraph Worker1["Worker Node 1"]
+        Ex4[Executor 1]
+        T1[Task 1]
+        T2[Task 2]
+        Cache1[Cache]
+        Ex4 --> T1
+        Ex4 --> T2
+        Ex4 --> Cache1
+    end
+    
+    subgraph Worker2["Worker Node 2"]
+        Ex5[Executor 2]
+        T3[Task 3]
+        T4[Task 4]
+        Cache2[Cache]
+        Ex5 --> T3
+        Ex5 --> T4
+        Ex5 --> Cache2
+    end
+    
+    subgraph Worker3["Worker Node 3"]
+        Ex6[Executor 3]
+        T5[Task 5]
+        T6[Task 6]
+        Cache3[Cache]
+        Ex6 --> T5
+        Ex6 --> T6
+        Ex6 --> Cache3
+    end
+    
+    SparkSubmit --> SC2
+    SC2 --> DAG4
+    DAG4 --> TaskSched
+    TaskSched <--> ResManager
+    ResManager --> Worker1
+    ResManager --> Worker2
+    ResManager --> Worker3
+    
+    TaskSched -.Task Assignment.-> Ex4
+    TaskSched -.Task Assignment.-> Ex5
+    TaskSched -.Task Assignment.-> Ex6
+    
+    Ex4 & Ex5 & Ex6 -.Status/Results.-> SC2
+    
+    style SC2 fill:#FF6B35,color:#fff
+    style ResManager fill:#4CAF50,color:#fff
+    style Ex4 fill:#2196F3,color:#fff
+    style Ex5 fill:#2196F3,color:#fff
+    style Ex6 fill:#2196F3,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Driver Program</h3>
+                    <p><strong>Responsibilities:</strong></p>
+                    <ul>
+                        <li>Runs the main() function</li>
+                        <li>Creates SparkContext/SparkSession</li>
+                        <li>Converts user code into tasks</li>
+                        <li>Schedules tasks on executors</li>
+                        <li>Maintains metadata and job progress</li>
+                        <li>Serves Spark UI on port 4040</li>
+                    </ul>
+                    <p><strong>Location:</strong> Can run on client or within cluster</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>Cluster Manager</h3>
+                    <p><strong>Types:</strong></p>
+                    <ul>
+                        <li><strong>Standalone:</strong> Simple built-in cluster manager</li>
+                        <li><strong>YARN:</strong> Hadoop's resource manager</li>
+                        <li><strong>Mesos:</strong> General cluster manager</li>
+                        <li><strong>Kubernetes:</strong> Container orchestration</li>
+                    </ul>
+                    <p><strong>Responsibilities:</strong></p>
+                    <ul>
+                        <li>Allocate resources to applications</li>
+                        <li>Launch executors on worker nodes</li>
+                        <li>Manage multi-tenancy</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⚙️</span>Executors</h3>
+                    <p><strong>Responsibilities:</strong></p>
+                    <ul>
+                        <li>Run tasks assigned by driver</li>
+                        <li>Store data in memory/disk (cache)</li>
+                        <li>Send results back to driver</li>
+                        <li>Provide metrics and logs</li>
+                    </ul>
+                    <p><strong>Configuration:</strong></p>
+                    <ul>
+                        <li><code>--executor-memory 4g</code></li>
+                        <li><code>--executor-cores 4</code></li>
+                        <li><code>--num-executors 10</code></li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span>Task Execution Flow</h3>
+                    <ol style="margin-left: 20px;">
+                        <li>Driver creates DAG from transformations</li>
+                        <li>DAG Scheduler divides DAG into stages</li>
+                        <li>Each stage creates tasks (one per partition)</li>
+                        <li>Task Scheduler sends tasks to executors</li>
+                        <li>Executors run tasks and cache results</li>
+                        <li>Results sent back to driver</li>
+                        <li>Driver aggregates final results</li>
+                    </ol>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔄</span>Dynamic Resource Allocation</h3>
+                    <p>Automatically scale executors based on workload:</p>
+                    <ul>
+                        <li><code>spark.dynamicAllocation.enabled=true</code></li>
+                        <li><code>spark.dynamicAllocation.minExecutors=2</code></li>
+                        <li><code>spark.dynamicAllocation.maxExecutors=20</code></li>
+                        <li><code>spark.dynamicAllocation.initialExecutors=5</code></li>
+                    </ul>
+                    <p><strong>Benefits:</strong> Better resource utilization, cost savings</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Memory Management</h3>
+                    <p>Executor memory is divided into:</p>
+                    <ul>
+                        <li><strong>Execution Memory (50%):</strong> Shuffles, joins, sorts</li>
+                        <li><strong>Storage Memory (50%):</strong> Cached data, broadcast variables</li>
+                        <li><strong>User Memory (~40%):</strong> User data structures</li>
+                        <li><strong>Reserved Memory (~300MB):</strong> Spark internal objects</li>
+                    </ul>
+                    <p>Configure: <code>spark.memory.fraction=0.6</code></p>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices for Cluster Configuration</h3>
+                <ul>
+                    <li><strong>Executor Size:</strong> 4-8 cores per executor for optimal parallelism</li>
+                    <li><strong>Memory:</strong> Set executor memory to 75% of node memory (25% for OS)</li>
+                    <li><strong>Cores:</strong> Total cores = num_executors × executor_cores</li>
+                    <li><strong>Parallelism:</strong> Set 2-3 tasks per core: <code>spark.default.parallelism</code></li>
+                    <li><strong>Driver Memory:</strong> Increase if collecting large results: <code>--driver-memory 8g</code></li>
+                    <li><strong>Overhead:</strong> Set <code>spark.yarn.executor.memoryOverhead</code> to 10% of executor memory</li>
+                    <li><strong>Locality:</strong> Enable data locality for HDFS: <code>spark.locality.wait=3s</code></li>
+                    <li><strong>Speculation:</strong> Enable for straggler tasks: <code>spark.speculation=true</code></li>
+                </ul>
+            </div>
+
+            <div class="dos-donts">
+                <div class="dos">
+                    <h3>✅ Do's</h3>
+                    <ul>
+                        <li>✓ Run driver in cluster mode for production</li>
+                        <li>✓ Monitor executor memory usage in Spark UI</li>
+                        <li>✓ Enable dynamic allocation for better resource usage</li>
+                        <li>✓ Configure appropriate number of executors</li>
+                        <li>✓ Set executor heartbeat timeout properly</li>
+                        <li>✓ Use external shuffle service for stability</li>
+                    </ul>
+                </div>
+                <div class="donts">
+                    <h3>❌ Don'ts</h3>
+                    <ul>
+                        <li>✗ Don't make executors too large (>64GB memory)</li>
+                        <li>✗ Don't set too many cores per executor (>5)</li>
+                        <li>✗ Don't forget to set executor memory overhead</li>
+                        <li>✗ Don't run client mode in production (driver failure)</li>
+                        <li>✗ Don't ignore driver memory requirements</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Spark on YARN -->
+        <div class="architecture" id="yarn">
+            <h2>🧩 5. Spark on YARN Architecture</h2>
+            
+            <pre class="mermaid">
+flowchart TB
+    subgraph Client2["Client Node"]
+        Submit2[spark-submit]
+    end
+    
+    subgraph RM["YARN Resource Manager"]
+        AppMaster[Application Master]
+        Scheduler2[Scheduler]
+        ResourceMgr[Resource Tracker]
+    end
+    
+    subgraph Driver3["Driver (Cluster Mode)"]
+        Driver4[Spark Driver<br/>Inside AM]
+    end
+    
+    subgraph Node1["Node Manager 1"]
+        Container1[Container 1<br/>Executor]
+        Container2[Container 2<br/>Executor]
+    end
+    
+    subgraph Node2["Node Manager 2"]
+        Container3[Container 3<br/>Executor]
+        Container4[Container 4<br/>Executor]
+    end
+    
+    subgraph Node3["Node Manager 3"]
+        Container5[Container 5<br/>Executor]
+        Container6[Container 6<br/>Executor]
+    end
+    
+    subgraph HDFS3["HDFS Storage"]
+        Data[Data Blocks]
+    end
+    
+    Submit2 -->|1. Submit App| RM
+    RM -->|2. Launch AM| AppMaster
+    AppMaster -->|3. Start Driver| Driver4
+    Driver4 -->|4. Request Containers| RM
+    RM -->|5. Allocate Resources| Node1 & Node2 & Node3
+    
+    Driver4 -.Tasks.-> Container1 & Container2 & Container3 & Container4 & Container5 & Container6
+    
+    Container1 & Container2 & Container3 <-->|Read/Write| Data
+    
+    style RM fill:#4CAF50,color:#fff
+    style Driver4 fill:#FF6B35,color:#fff
+    style Container1 fill:#2196F3,color:#fff
+    style Container3 fill:#2196F3,color:#fff
+    style Container5 fill:#2196F3,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">❓</span>What is Spark on YARN?</h3>
+                    <p>Integration that allows Spark to run on Hadoop YARN clusters, leveraging existing Hadoop infrastructure for resource management and scheduling.</p>
+                    <p><strong>Key Benefits:</strong></p>
+                    <ul>
+                        <li>Share cluster with MapReduce, Hive, and other applications</li>
+                        <li>Centralized resource management</li>
+                        <li>Security integration (Kerberos)</li>
+                        <li>Multi-tenancy support</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>Deployment Modes</h3>
+                    <p><strong>1. Cluster Mode:</strong></p>
+                    <ul>
+                        <li>Driver runs inside YARN Application Master</li>
+                        <li>Recommended for production</li>
+                        <li>Survives client disconnection</li>
+                        <li><code>--deploy-mode cluster</code></li>
+                    </ul>
+                    <p><strong>2. Client Mode:</strong></p>
+                    <ul>
+                        <li>Driver runs on client submitting job</li>
+                        <li>Good for interactive/debugging</li>
+                        <li>Client must stay connected</li>
+                        <li><code>--deploy-mode client</code></li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📋</span>Submission Command</h3>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto;">
+spark-submit \
+  --master yarn \
+  --deploy-mode cluster \
+  --driver-memory 4g \
+  --executor-memory 8g \
+  --executor-cores 4 \
+  --num-executors 10 \
+  --conf spark.sql.shuffle.partitions=200 \
+  --conf spark.dynamicAllocation.enabled=true \
+  myapp.py
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⚙️</span>YARN Components</h3>
+                    <p><strong>Resource Manager:</strong></p>
+                    <ul>
+                        <li>Central resource authority</li>
+                        <li>Allocates containers to applications</li>
+                        <li>Manages cluster resources</li>
+                    </ul>
+                    <p><strong>Node Manager:</strong></p>
+                    <ul>
+                        <li>Runs on each worker node</li>
+                        <li>Launches and monitors containers</li>
+                        <li>Reports resource usage</li>
+                    </ul>
+                    <p><strong>Application Master:</strong></p>
+                    <ul>
+                        <li>Per-application resource negotiator</li>
+                        <li>Tracks application progress</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔄</span>Execution Flow</h3>
+                    <ol style="margin-left: 20px;">
+                        <li>Client submits Spark application to YARN</li>
+                        <li>ResourceManager allocates container for Application Master</li>
+                        <li>Application Master starts Spark Driver (cluster mode)</li>
+                        <li>Driver requests executor containers from RM</li>
+                        <li>NodeManagers launch executor containers</li>
+                        <li>Driver schedules tasks on executors</li>
+                        <li>Executors run tasks and report back</li>
+                        <li>Application completes, resources released</li>
+                    </ol>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Key Configurations</h3>
+                    <ul>
+                        <li><code>spark.yarn.am.memory</code>: AM memory (driver memory in cluster mode)</li>
+                        <li><code>spark.yarn.executor.memoryOverhead</code>: Overhead for off-heap memory</li>
+                        <li><code>spark.yarn.maxAppAttempts</code>: Max application retry attempts</li>
+                        <li><code>spark.yarn.queue</code>: YARN queue to submit to</li>
+                        <li><code>spark.yarn.archive</code>: Spark jars archive location</li>
+                        <li><code>spark.yarn.preserve.staging.files</code>: Keep staging files for debugging</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices for Spark on YARN</h3>
+                <ul>
+                    <li><strong>Cluster Mode:</strong> Always use cluster mode for production jobs</li>
+                    <li><strong>Memory Overhead:</strong> Set executor memory overhead to 10% of executor memory</li>
+                    <li><strong>Queue Selection:</strong> Use appropriate YARN queue based on priority</li>
+                    <li><strong>Dynamic Allocation:</strong> Enable for efficient resource sharing</li>
+                    <li><strong>External Shuffle Service:</strong> Enable for better dynamic allocation: <code>spark.shuffle.service.enabled=true</code></li>
+                    <li><strong>Log Aggregation:</strong> Enable YARN log aggregation for easier debugging</li>
+                    <li><strong>AM Memory:</strong> Set AM memory = driver memory in cluster mode</li>
+                    <li><strong>Container Sizing:</strong> Ensure executor memory + overhead < container memory</li>
+                    <li><strong>Security:</strong> Use Kerberos authentication in secure clusters</li>
+                </ul>
+            </div>
+
+            <div class="dos-donts">
+                <div class="dos">
+                    <h3>✅ Do's</h3>
+                    <ul>
+                        <li>✓ Use cluster mode for production deployments</li>
+                        <li>✓ Enable external shuffle service for stability</li>
+                        <li>✓ Configure memory overhead appropriately</li>
+                        <li>✓ Monitor YARN Resource Manager UI</li>
+                        <li>✓ Use dynamic allocation for shared clusters</li>
+                        <li>✓ Set appropriate YARN queue and priorities</li>
+                        <li>✓ Enable log aggregation for troubleshooting</li>
+                    </ul>
+                </div>
+                <div class="donts">
+                    <h3>❌ Don'ts</h3>
+                    <ul>
+                        <li>✗ Don't use client mode for long-running jobs</li>
+                        <li>✗ Don't forget to set memory overhead</li>
+                        <li>✗ Don't request more memory than node capacity</li>
+                        <li>✗ Don't ignore YARN resource limits</li>
+                        <li>✗ Don't run without external shuffle service in dynamic mode</li>
+                        <li>✗ Don't submit to wrong YARN queue</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Spark with HDFS -->
+        <div class="architecture" id="hdfs">
+            <h2>💾 6. Spark with HDFS Integration</h2>
+            
+            <pre class="mermaid">
+flowchart LR
+    subgraph Spark2["Spark Cluster"]
+        Driver5[Spark Driver]
+        Ex7[Executor 1]
+        Ex8[Executor 2]
+        Ex9[Executor 3]
+        
+        Driver5 --> Ex7
+        Driver5 --> Ex8
+        Driver5 --> Ex9
+    end
+    
+    subgraph HDFS4["HDFS Cluster"]
+        NN2[NameNode<br/>Metadata]
+        DN6[DataNode 1<br/>Block A1, A3]
+        DN7[DataNode 2<br/>Block A2, B1]
+        DN8[DataNode 3<br/>Block A1, B2]
+        
+        NN2 -.Metadata.-> DN6 & DN7 & DN8
+    end
+    
+    Ex7 <-->|Data Locality| DN6
+    Ex8 <-->|Data Locality| DN7
+    Ex9 <-->|Data Locality| DN8
+    
+    Driver5 <-.Query Metadata.-> NN2
+    
+    style Driver5 fill:#FF6B35,color:#fff
+    style NN2 fill:#4CAF50,color:#fff
+    style Ex7 fill:#2196F3,color:#fff
+    style Ex8 fill:#2196F3,color:#fff
+    style Ex9 fill:#2196F3,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">🔗</span>Integration Overview</h3>
+                    <p>Spark uses HDFS as primary storage layer, enabling:</p>
+                    <ul>
+                        <li><strong>Data Locality:</strong> Process data where it's stored</li>
+                        <li><strong>Fault Tolerance:</strong> Leverage HDFS replication</li>
+                        <li><strong>Scalability:</strong> Store petabytes of data</li>
+                        <li><strong>Compatibility:</strong> Read/write HDFS files directly</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📁</span>Reading from HDFS</h3>
+                    <p><strong>RDD API:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+rdd = sc.textFile("hdfs://namenode:9000/path/to/file")
+                    </pre>
+                    <p><strong>DataFrame API:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+df = spark.read.parquet("hdfs:///path/to/data")
+df = spark.read.csv("hdfs:///path/file.csv")
+df = spark.read.json("hdfs:///path/file.json")
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💾</span>Writing to HDFS</h3>
+                    <p><strong>RDD API:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+rdd.saveAsTextFile("hdfs:///output/path")
+                    </pre>
+                    <p><strong>DataFrame API:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+df.write.mode("overwrite").parquet("hdfs:///path")
+df.write.partitionBy("date").parquet("hdfs:///path")
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Data Locality</h3>
+                    <p>Spark optimizes performance by processing data locally:</p>
+                    <ul>
+                        <li><strong>PROCESS_LOCAL:</strong> Data in same JVM</li>
+                        <li><strong>NODE_LOCAL:</strong> Data on same node</li>
+                        <li><strong>RACK_LOCAL:</strong> Data on same rack</li>
+                        <li><strong>ANY:</strong> Data anywhere (slowest)</li>
+                    </ul>
+                    <p>Configure: <code>spark.locality.wait=3s</code></p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span>Supported File Formats</h3>
+                    <ul>
+                        <li><strong>Parquet:</strong> Columnar, compressed, best for analytics</li>
+                        <li><strong>ORC:</strong> Optimized Row Columnar, Hive-compatible</li>
+                        <li><strong>Avro:</strong> Row-based, good for streaming</li>
+                        <li><strong>JSON:</strong> Schema-flexible, human-readable</li>
+                        <li><strong>CSV:</strong> Simple, widely supported</li>
+                        <li><strong>SequenceFile:</strong> Hadoop binary format</li>
+                        <li><strong>Text:</strong> Plain text files</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⚙️</span>HDFS Configuration</h3>
+                    <ul>
+                        <li><code>spark.hadoop.fs.defaultFS</code>: HDFS NameNode URI</li>
+                        <li><code>spark.hadoop.dfs.replication</code>: Replication factor</li>
+                        <li><code>spark.hadoop.dfs.blocksize</code>: Block size (128MB default)</li>
+                        <li><code>fs.hdfs.impl.disable.cache</code>: Disable FS cache</li>
+                    </ul>
+                    <p><strong>Example:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+spark.conf.set("spark.hadoop.fs.defaultFS", "hdfs://namenode:9000")
+                    </pre>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices for Spark with HDFS</h3>
+                <ul>
+                    <li><strong>File Format:</strong> Use Parquet for analytical workloads (10x faster than text)</li>
+                    <li><strong>Partitioning:</strong> Partition data by commonly filtered columns: <code>partitionBy("year", "month")</code></li>
+                    <li><strong>Compression:</strong> Enable compression: <code>spark.sql.parquet.compression.codec=snappy</code></li>
+                    <li><strong>Small Files:</strong> Avoid creating many small files (coalesce/repartition before write)</li>
+                    <li><strong>Data Locality:</strong> Increase <code>spark.locality.wait</code> if locality is poor</li>
+                    <li><strong>Block Size:</strong> Match HDFS block size with input split size</li>
+                    <li><strong>Speculative Execution:</strong> Enable for HDFS reads: <code>spark.speculation=true</code></li>
+                    <li><strong>Short-Circuit Reads:</strong> Enable for better performance on local DataNode</li>
+                    <li><strong>Schema Evolution:</strong> Use Parquet's schema evolution for backward compatibility</li>
+                </ul>
+            </div>
+
+            <div class="dos-donts">
+                <div class="dos">
+                    <h3>✅ Do's</h3>
+                    <ul>
+                        <li>✓ Use Parquet/ORC for structured data</li>
+                        <li>✓ Partition large datasets appropriately</li>
+                        <li>✓ Enable compression to save storage</li>
+                        <li>✓ Coalesce partitions before writing</li>
+                        <li>✓ Use predicate pushdown filters early</li>
+                        <li>✓ Monitor data locality in Spark UI</li>
+                        <li>✓ Use columnar formats for projection queries</li>
+                    </ul>
+                </div>
+                <div class="donts">
+                    <h3>❌ Don'ts</h3>
+                    <ul>
+                        <li>✗ Don't create thousands of small files</li>
+                        <li>✗ Don't use text files for large datasets</li>
+                        <li>✗ Don't ignore data locality issues</li>
+                        <li>✗ Don't over-partition (too many directories)</li>
+                        <li>✗ Don't write without compression</li>
+                        <li>✗ Don't use JSON for large-scale analytics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Spark vs MapReduce -->
+        <div class="architecture" id="vs-mapreduce">
+            <h2>⚖️ 7. Spark vs MapReduce Comparison</h2>
+            
+            <pre class="mermaid">
+flowchart TB
+    subgraph MR["MapReduce"]
+        direction TB
+        Input1[Input Data<br/>HDFS]
+        Map1[Map Phase<br/>Disk Write]
+        Shuffle1[Shuffle & Sort<br/>Disk I/O]
+        Reduce1[Reduce Phase<br/>Disk Write]
+        Output1[Output<br/>HDFS]
+        
+        Input1 --> Map1
+        Map1 --> Shuffle1
+        Shuffle1 --> Reduce1
+        Reduce1 --> Output1
+    end
+    
+    subgraph Spark3["Spark"]
+        direction TB
+        Input2[Input Data<br/>HDFS]
+        Transform[Transformations<br/>In-Memory]
+        Action2[Action<br/>Compute]
+        Output2[Output<br/>HDFS/Memory]
+        
+        Input2 --> Transform
+        Transform --> Action2
+        Action2 --> Output2
+    end
+    
+    style Map1 fill:#FF9800
+    style Shuffle1 fill:#F44336
+    style Reduce1 fill:#FF9800
+    style Transform fill:#4CAF50
+    style Action2 fill:#2196F3
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">⚡</span>Performance Comparison</h3>
+                    <table style="width:100%; border-collapse: collapse;">
+                        <tr style="background: #f0f0f0;">
+                            <th style="padding: 8px; border: 1px solid #ddd;">Metric</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">Spark</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">MapReduce</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Speed</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">10-100x faster</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Baseline</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Processing</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">In-memory</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Disk-based</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Iterations</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Excellent (cached)</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Poor (disk I/O)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Real-time</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Yes (Streaming)</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">No (batch only)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;">APIs</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">High-level (Python, Scala, SQL)</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">Low-level (Java)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔄</span>Processing Model</h3>
+                    <p><strong>MapReduce:</strong></p>
+                    <ul>
+                        <li>Fixed Map → Shuffle → Reduce pattern</li>
+                        <li>Writes intermediate data to disk</li>
+                        <li>Each job is independent</li>
+                        <li>No in-memory caching</li>
+                    </ul>
+                    <p><strong>Spark:</strong></p>
+                    <ul>
+                        <li>Flexible DAG of transformations</li>
+                        <li>In-memory computation</li>
+                        <li>Lazy evaluation</li>
+                        <li>Caching for iterative algorithms</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💻</span>Ease of Use</h3>
+                    <p><strong>MapReduce Example:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+// 50+ lines of Java code
+public class WordCount {
+  public static class Map { ... }
+  public static class Reduce { ... }
+  public static void main() { ... }
+}
+                    </pre>
+                    <p><strong>Spark Example:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+# 2 lines of Python
+df = spark.read.text("file.txt")
+df.groupBy("word").count().show()
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>Use Case Suitability</h3>
+                    <p><strong>Use MapReduce When:</strong></p>
+                    <ul>
+                        <li>Very large batch jobs (TB+ data)</li>
+                        <li>Simple ETL workloads</li>
+                        <li>Memory constraints</li>
+                        <li>One-time processing jobs</li>
+                    </ul>
+                    <p><strong>Use Spark When:</strong></p>
+                    <ul>
+                        <li>Iterative algorithms (ML)</li>
+                        <li>Interactive queries</li>
+                        <li>Stream processing</li>
+                        <li>Complex data pipelines</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💾</span>Memory vs Disk</h3>
+                    <p><strong>MapReduce:</strong></p>
+                    <ul>
+                        <li>Writes after each map/reduce</li>
+                        <li>High disk I/O overhead</li>
+                        <li>Suitable for very large datasets</li>
+                        <li>Lower memory requirements</li>
+                    </ul>
+                    <p><strong>Spark:</strong></p>
+                    <ul>
+                        <li>Keeps data in memory</li>
+                        <li>Spills to disk if needed</li>
+                        <li>10-100x faster for iterative jobs</li>
+                        <li>Higher memory requirements</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span>Iterative Processing</h3>
+                    <p><strong>Example: K-Means Clustering</strong></p>
+                    <p>MapReduce: Each iteration writes to disk → Slow</p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+Iteration 1: Read → Compute → Write to HDFS
+Iteration 2: Read → Compute → Write to HDFS
+...
+Iteration 10: Read → Compute → Write to HDFS
+                    </pre>
+                    <p>Spark: Cache data in memory → Fast</p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+data.cache()  # Load once
+for i in range(10):
+    # Compute in memory (fast)
+                    </pre>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h3>✅ Spark Advantages</h3>
+                    <ul>
+                        <li>10-100x faster for iterative workloads</li>
+                        <li>In-memory computation</li>
+                        <li>Unified batch, streaming, ML, graph</li>
+                        <li>Easy-to-use high-level APIs</li>
+                        <li>Interactive shell for exploration</li>
+                        <li>Better for machine learning</li>
+                        <li>Lower latency</li>
+                        <li>Active development and community</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h3>✅ MapReduce Advantages</h3>
+                    <ul>
+                        <li>More mature and battle-tested</li>
+                        <li>Better for very large datasets</li>
+                        <li>Lower memory requirements</li>
+                        <li>Stable and predictable</li>
+                        <li>Works well with limited RAM</li>
+                        <li>Better fault isolation</li>
+                        <li>Simpler for one-time batch jobs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Migration Best Practices</h3>
+                <ul>
+                    <li><strong>Assess Workload:</strong> Identify iterative/interactive jobs → migrate to Spark</li>
+                    <li><strong>Start Small:</strong> Begin with non-critical jobs</li>
+                    <li><strong>Data Formats:</strong> Convert to Parquet/ORC for better Spark performance</li>
+                    <li><strong>Memory Planning:</strong> Ensure adequate memory for Spark executors</li>
+                    <li><strong>Coexistence:</strong> Run Spark and MapReduce side-by-side initially</li>
+                    <li><strong>Monitoring:</strong> Set up Spark UI monitoring and logging</li>
+                    <li><strong>Training:</strong> Train team on Spark APIs and best practices</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 8. Deployment Modes -->
+        <div class="architecture" id="deployment">
+            <h2>🚀 8. Spark Deployment Modes</h2>
+            
+            <pre class="mermaid">
+flowchart TB
+    subgraph Modes["Deployment Modes"]
+        Local[Local Mode<br/>Single Machine]
+        Standalone[Standalone Mode<br/>Spark Cluster]
+        YARN2[YARN Mode<br/>Hadoop Cluster]
+        Mesos2[Mesos Mode<br/>Apache Mesos]
+        K8s[Kubernetes Mode<br/>Container Orchestration]
+    end
+    
+    subgraph UseCase["Use Cases"]
+        Dev[Development<br/>& Testing]
+        SmallCluster[Small Clusters<br/>Dedicated Spark]
+        HadoopEnv[Hadoop<br/>Environments]
+        MultiFramework[Multi-Framework<br/>Clusters]
+        CloudNative[Cloud-Native<br/>Deployments]
+    end
+    
+    Local --> Dev
+    Standalone --> SmallCluster
+    YARN2 --> HadoopEnv
+    Mesos2 --> MultiFramework
+    K8s --> CloudNative
+    
+    style Local fill:#FFC107
+    style Standalone fill:#FF6B35
+    style YARN2 fill:#4CAF50
+    style Mesos2 fill:#2196F3
+    style K8s fill:#9C27B0
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">💻</span>1. Local Mode</h3>
+                    <p><strong>Description:</strong> Runs Spark on a single machine.</p>
+                    <p><strong>Usage:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+spark-submit --master local[4] myapp.py
+# [4] = use 4 cores
+# local[*] = use all cores
+                    </pre>
+                    <p><strong>When to Use:</strong></p>
+                    <ul>
+                        <li>Development and testing</li>
+                        <li>Learning Spark</li>
+                        <li>Small datasets</li>
+                        <li>Debugging applications</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔧</span>2. Standalone Mode</h3>
+                    <p><strong>Description:</strong> Spark's built-in cluster manager.</p>
+                    <p><strong>Setup:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+# Start master
+./sbin/start-master.sh
+
+# Start workers
+./sbin/start-worker.sh spark://master:7077
+
+# Submit job
+spark-submit --master spark://master:7077 myapp.py
+                    </pre>
+                    <p><strong>Best For:</strong> Dedicated Spark clusters</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🧩</span>3. YARN Mode</h3>
+                    <p><strong>Description:</strong> Run on Hadoop YARN clusters.</p>
+                    <p><strong>Modes:</strong></p>
+                    <ul>
+                        <li><strong>Cluster:</strong> Driver in YARN (production)</li>
+                        <li><strong>Client:</strong> Driver on client (interactive)</li>
+                    </ul>
+                    <p><strong>Submit:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+spark-submit --master yarn \
+  --deploy-mode cluster \
+  myapp.py
+                    </pre>
+                    <p><strong>Best For:</strong> Existing Hadoop environments</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⚙️</span>4. Mesos Mode</h3>
+                    <p><strong>Description:</strong> Run on Apache Mesos.</p>
+                    <p><strong>Features:</strong></p>
+                    <ul>
+                        <li>Fine-grained resource sharing</li>
+                        <li>Dynamic resource allocation</li>
+                        <li>Multi-framework support</li>
+                    </ul>
+                    <p><strong>Submit:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+spark-submit --master mesos://master:5050 myapp.py
+                    </pre>
+                    <p><strong>Best For:</strong> Multi-framework clusters</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">☸️</span>5. Kubernetes Mode</h3>
+                    <p><strong>Description:</strong> Run Spark on Kubernetes.</p>
+                    <p><strong>Features:</strong></p>
+                    <ul>
+                        <li>Container-based deployment</li>
+                        <li>Auto-scaling</li>
+                        <li>Cloud-native architecture</li>
+                    </ul>
+                    <p><strong>Submit:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+spark-submit --master k8s://https://k8s-master:443 \
+  --deploy-mode cluster \
+  --conf spark.kubernetes.container.image=spark:latest \
+  myapp.py
+                    </pre>
+                    <p><strong>Best For:</strong> Cloud-native, microservices</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span>Comparison Matrix</h3>
+                    <table style="width:100%; border-collapse: collapse; font-size: 0.85em;">
+                        <tr style="background: #f0f0f0;">
+                            <th style="padding: 6px; border: 1px solid #ddd;">Feature</th>
+                            <th style="padding: 6px; border: 1px solid #ddd;">Local</th>
+                            <th style="padding: 6px; border: 1px solid #ddd;">Standalone</th>
+                            <th style="padding: 6px; border: 1px solid #ddd;">YARN</th>
+                            <th style="padding: 6px; border: 1px solid #ddd;">K8s</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Setup</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Easy</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Medium</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Complex</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Medium</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Multi-tenancy</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">No</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Limited</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Yes</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Yes</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Resource Sharing</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">N/A</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Spark only</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">All Hadoop</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">All containers</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Best Use</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Dev/Test</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Dedicated</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Hadoop</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">Cloud</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices by Deployment Mode</h3>
+                <ul>
+                    <li><strong>Local Mode:</strong> Use for rapid prototyping; sample data to fit in memory</li>
+                    <li><strong>Standalone:</strong> Good for dedicated Spark clusters; simple setup; use for POCs</li>
+                    <li><strong>YARN:</strong> Best for enterprise Hadoop environments; use cluster mode for production</li>
+                    <li><strong>Kubernetes:</strong> Ideal for cloud-native; use namespaces for isolation; leverage auto-scaling</li>
+                    <li><strong>Security:</strong> Enable authentication/encryption in production</li>
+                    <li><strong>Monitoring:</strong> Set up centralized logging (ELK, Splunk)</li>
+                    <li><strong>High Availability:</strong> Use ZooKeeper for master failover in Standalone/Mesos</li>
+                </ul>
+            </div>
+
+            <div class="dos-donts">
+                <div class="dos">
+                    <h3>✅ Do's</h3>
+                    <ul>
+                        <li>✓ Choose deployment mode based on existing infrastructure</li>
+                        <li>✓ Use cluster mode for production jobs</li>
+                        <li>✓ Enable monitoring and logging</li>
+                        <li>✓ Set resource limits appropriately</li>
+                        <li>✓ Use dynamic allocation for shared clusters</li>
+                        <li>✓ Test in local mode before deploying</li>
+                    </ul>
+                </div>
+                <div class="donts">
+                    <h3>❌ Don'ts</h3>
+                    <ul>
+                        <li>✗ Don't run production workloads in local mode</li>
+                        <li>✗ Don't mix deployment modes without planning</li>
+                        <li>✗ Don't ignore security in production</li>
+                        <li>✗ Don't over-provision resources</li>
+                        <li>✗ Don't skip monitoring and alerting</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. Spark Internals & Catalyst Optimizer -->
+        <div class="architecture" id="internals">
+            <h2>🔬 9. Spark Internals & Catalyst Optimizer</h2>
+            
+            <pre class="mermaid">
+flowchart TB
+    subgraph User["User Code"]
+        SQL[SQL Query / DataFrame API]
+    end
+    
+    subgraph Catalyst["Catalyst Optimizer"]
+        Unresolved[Unresolved<br/>Logical Plan]
+        Resolved[Resolved<br/>Logical Plan]
+        Optimized[Optimized<br/>Logical Plan]
+        Physical[Physical Plans]
+    end
+    
+    subgraph Tungsten["Tungsten Execution Engine"]
+        CodeGen[Whole-Stage<br/>Code Generation]
+        OffHeap[Off-Heap<br/>Memory Management]
+        Execution[Optimized<br/>Execution]
+    end
+    
+    subgraph Result["Execution"]
+        Tasks[Distributed<br/>Tasks]
+        Output[Results]
+    end
+    
+    SQL --> Unresolved
+    Unresolved --> Resolved
+    Resolved --> Optimized
+    Optimized --> Physical
+    Physical --> CodeGen
+    CodeGen --> OffHeap
+    OffHeap --> Execution
+    Execution --> Tasks
+    Tasks --> Output
+    
+    style Catalyst fill:#FF6B35,color:#fff
+    style Tungsten fill:#4CAF50,color:#fff
+    style CodeGen fill:#2196F3,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">🧠</span>Catalyst Optimizer</h3>
+                    <p><strong>Purpose:</strong> Query optimization engine that rewrites logical plans for maximum efficiency.</p>
+                    <p><strong>Optimization Phases:</strong></p>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Analysis:</strong> Resolve column names, data types</li>
+                        <li><strong>Logical Optimization:</strong> Apply rule-based optimizations</li>
+                        <li><strong>Physical Planning:</strong> Generate multiple physical plans</li>
+                        <li><strong>Cost-Based Optimization:</strong> Select best plan using statistics</li>
+                    </ol>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⚡</span>Catalyst Optimizations</h3>
+                    <ul>
+                        <li><strong>Predicate Pushdown:</strong> Push filters to data source</li>
+                        <li><strong>Projection Pushdown:</strong> Read only required columns</li>
+                        <li><strong>Constant Folding:</strong> Evaluate constants at compile time</li>
+                        <li><strong>Filter Reordering:</strong> Apply selective filters first</li>
+                        <li><strong>Join Reordering:</strong> Optimize join order based on cost</li>
+                        <li><strong>Common Subexpression Elimination:</strong> Reuse computed values</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🚀</span>Tungsten Engine</h3>
+                    <p><strong>Purpose:</strong> Execution engine focused on CPU and memory efficiency.</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li><strong>Off-Heap Memory:</strong> Bypass JVM GC overhead</li>
+                        <li><strong>Cache-Aware Computation:</strong> Optimize CPU cache usage</li>
+                        <li><strong>Whole-Stage Code Generation:</strong> Compile to bytecode</li>
+                        <li><strong>Binary Format:</strong> Efficient data representation</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span>Analyzing Execution Plans</h3>
+                    <p><strong>View Logical Plan:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+df.explain(mode="simple")  # Logical plan
+df.explain(mode="extended")  # All plans
+df.explain(mode="cost")  # With cost info
+df.explain(mode="formatted")  # Pretty print
+                    </pre>
+                    <p><strong>Key Indicators:</strong></p>
+                    <ul>
+                        <li>Look for <code>Exchange</code> → Shuffle operation</li>
+                        <li><code>WholeStageCodegen</code> → Optimized execution</li>
+                        <li><code>Filter</code> after <code>Scan</code> → Good (pushdown)</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔍</span>Monitoring with Spark UI</h3>
+                    <p><strong>Key Tabs:</strong></p>
+                    <ul>
+                        <li><strong>Jobs:</strong> Overall job progress and metrics</li>
+                        <li><strong>Stages:</strong> Task-level details, skew detection</li>
+                        <li><strong>Storage:</strong> Cached RDD/DataFrame memory</li>
+                        <li><strong>SQL:</strong> Query plans and execution details</li>
+                        <li><strong>Executors:</strong> Resource usage per executor</li>
+                    </ul>
+                    <p><strong>URL:</strong> http://driver:4040</p>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🐛</span>Debugging Performance Issues</h3>
+                    <ul>
+                        <li><strong>Data Skew:</strong> Check task duration variance in Stages tab</li>
+                        <li><strong>Memory Issues:</strong> Monitor GC time in Executors tab</li>
+                        <li><strong>Shuffle Overhead:</strong> Look for large shuffle read/write</li>
+                        <li><strong>Spill to Disk:</strong> Indicates memory pressure</li>
+                        <li><strong>Slow Tasks:</strong> Enable speculation or repartition</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices for Performance</h3>
+                <ul>
+                    <li><strong>Use DataFrame/Dataset API:</strong> Better optimization than RDD API</li>
+                    <li><strong>Enable Statistics:</strong> <code>ANALYZE TABLE table_name COMPUTE STATISTICS</code></li>
+                    <li><strong>Monitor Query Plans:</strong> Use <code>explain()</code> before running expensive queries</li>
+                    <li><strong>Enable Adaptive Query Execution:</strong> <code>spark.sql.adaptive.enabled=true</code></li>
+                    <li><strong>Use Broadcast Join:</strong> For small tables: <code>broadcast(small_df)</code></li>
+                    <li><strong>Enable Arrow:</strong> <code>spark.sql.execution.arrow.pyspark.enabled=true</code></li>
+                    <li><strong>Tune Shuffle Partitions:</strong> <code>spark.sql.shuffle.partitions=200</code> (adjust based on data size)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 10. Custom UDFs (User-Defined Functions) -->
+        <div class="architecture" id="udfs">
+            <h2>🔧 10. Custom UDFs (User-Defined Functions)</h2>
+            
+            <pre class="mermaid">
+flowchart LR
+    subgraph Types["UDF Types"]
+        Scalar[Scalar UDF<br/>Row by Row]
+        Pandas[Pandas UDF<br/>Vectorized]
+        Aggregate[UDAF<br/>Aggregation]
+    end
+    
+    subgraph Definition["Define"]
+        Python[Python Function]
+        Register[Register UDF]
+    end
+    
+    subgraph Usage["Use"]
+        DataFrame[DataFrame API]
+        SQL[SQL Query]
+    end
+    
+    Python --> Register
+    Register --> Types
+    Types --> DataFrame
+    Types --> SQL
+    
+    style Scalar fill:#FF6B35,color:#fff
+    style Pandas fill:#4CAF50,color:#fff
+    style Aggregate fill:#2196F3,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">📝</span>Creating Scalar UDFs</h3>
+                    <p><strong>Python Example:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+from pyspark.sql.functions import udf
+from pyspark.sql.types import StringType
+
+# Define function
+def upper_case(text):
+    return text.upper() if text else None
+
+# Register as UDF
+upper_udf = udf(upper_case, StringType())
+
+# Use in DataFrame
+df.withColumn("upper", upper_udf("name"))
+
+# Register for SQL
+spark.udf.register("to_upper", upper_case)
+spark.sql("SELECT to_upper(name) FROM table")
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⚡</span>Pandas UDFs (Vectorized)</h3>
+                    <p><strong>Much faster than regular Python UDFs!</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+from pyspark.sql.functions import pandas_udf
+import pandas as pd
+
+@pandas_udf("double")
+def multiply_by_two(s: pd.Series) -> pd.Series:
+    return s * 2
+
+df.withColumn("doubled", multiply_by_two("value"))
+                    </pre>
+                    <p><strong>Types:</strong></p>
+                    <ul>
+                        <li><strong>Series to Series:</strong> Element-wise transformation</li>
+                        <li><strong>Iterator:</strong> Batch processing</li>
+                        <li><strong>Grouped Map:</strong> Group-wise operations</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span>User-Defined Aggregate Functions (UDAF)</h3>
+                    <p><strong>For custom aggregations:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+from pyspark.sql.functions import pandas_udf, PandasUDFType
+
+@pandas_udf("double", PandasUDFType.GROUPED_AGG)
+def weighted_avg(values, weights):
+    return (values * weights).sum() / weights.sum()
+
+df.groupBy("category").agg(
+    weighted_avg("price", "quantity").alias("avg_price")
+)
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span>When to Use UDFs</h3>
+                    <p><strong>Good Use Cases:</strong></p>
+                    <ul>
+                        <li>Domain-specific business logic</li>
+                        <li>Complex string parsing/formatting</li>
+                        <li>Custom mathematical calculations</li>
+                        <li>Integration with external libraries</li>
+                        <li>ML model scoring</li>
+                    </ul>
+                    <p><strong>Avoid UDFs When:</strong></p>
+                    <ul>
+                        <li>Built-in Spark function exists</li>
+                        <li>Can be done with SQL expressions</li>
+                        <li>Performance is critical (use Scala UDF)</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⚠️</span>Performance Considerations</h3>
+                    <ul>
+                        <li><strong>Python UDF:</strong> Slow (serialization overhead)</li>
+                        <li><strong>Pandas UDF:</strong> 10-100x faster (vectorized with Arrow)</li>
+                        <li><strong>Scala UDF:</strong> Fastest (native JVM)</li>
+                        <li><strong>Built-in Functions:</strong> Always fastest (optimized by Catalyst)</li>
+                    </ul>
+                    <p><strong>Enable Arrow:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+spark.conf.set("spark.sql.execution.arrow.pyspark.enabled", "true")
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔒</span>Security & Governance</h3>
+                    <ul>
+                        <li><strong>Input Validation:</strong> Always validate and sanitize inputs</li>
+                        <li><strong>Error Handling:</strong> Use try-except to handle edge cases</li>
+                        <li><strong>Deterministic:</strong> Same input → same output (for reproducibility)</li>
+                        <li><strong>Audit Logging:</strong> Track UDF usage and versions</li>
+                        <li><strong>Testing:</strong> Unit test UDFs before deployment</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices for UDFs</h3>
+                <ul>
+                    <li><strong>Prefer Built-in Functions:</strong> Always check if Spark has a built-in alternative</li>
+                    <li><strong>Use Pandas UDFs:</strong> For Python, always prefer pandas_udf over regular udf</li>
+                    <li><strong>Batch Processing:</strong> Process data in batches using Iterator type Pandas UDFs</li>
+                    <li><strong>Type Hints:</strong> Use type annotations for better error detection</li>
+                    <li><strong>Null Handling:</strong> Always handle null values explicitly</li>
+                    <li><strong>Avoid Side Effects:</strong> UDFs should be pure functions</li>
+                    <li><strong>Test with Sample Data:</strong> Benchmark performance before production</li>
+                    <li><strong>Document Well:</strong> Clear docstrings with examples</li>
+                </ul>
+            </div>
+
+            <div class="dos-donts">
+                <div class="dos">
+                    <h3>✅ Do's</h3>
+                    <ul>
+                        <li>✓ Use Pandas UDFs for vectorized operations</li>
+                        <li>✓ Enable Arrow for better performance</li>
+                        <li>✓ Register UDFs once and reuse</li>
+                        <li>✓ Handle null values explicitly</li>
+                        <li>✓ Add type annotations</li>
+                        <li>✓ Test UDFs with unit tests</li>
+                        <li>✓ Use Scala UDFs for critical paths</li>
+                    </ul>
+                </div>
+                <div class="donts">
+                    <h3>❌ Don'ts</h3>
+                    <ul>
+                        <li>✗ Don't use UDFs when built-in functions exist</li>
+                        <li>✗ Don't use Python UDFs without Arrow</li>
+                        <li>✗ Don't ignore null value handling</li>
+                        <li>✗ Don't create stateful UDFs</li>
+                        <li>✗ Don't use UDFs in tight loops</li>
+                        <li>✗ Don't skip performance testing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11. External Data Sources -->
+        <div class="architecture" id="datasources">
+            <h2>🔌 11. External Data Sources Integration</h2>
+            
+            <pre class="mermaid">
+flowchart TB
+    subgraph Spark2["Apache Spark"]
+        DataFrameAPI[DataFrame API]
+    end
+    
+    subgraph Relational["Relational Databases"]
+        MySQL[MySQL]
+        PostgreSQL[PostgreSQL]
+        Oracle[Oracle]
+        SQLServer[SQL Server]
+    end
+    
+    subgraph FileFormats["File Formats"]
+        Parquet2[Parquet]
+        JSON2[JSON]
+        CSV2[CSV]
+        Avro2[Avro]
+    end
+    
+    subgraph NoSQL["NoSQL & Data Lakes"]
+        MongoDB[MongoDB]
+        Cassandra2[Cassandra]
+        HBase3[HBase]
+        Delta2[Delta Lake]
+    end
+    
+    subgraph Cloud["Cloud Storage"]
+        S32[AWS S3]
+        ADLS[Azure Data Lake]
+        GCS[Google Cloud Storage]
+    end
+    
+    DataFrameAPI <--> Relational
+    DataFrameAPI <--> FileFormats
+    DataFrameAPI <--> NoSQL
+    DataFrameAPI <--> Cloud
+    
+    style DataFrameAPI fill:#FF6B35,color:#fff
+    style Parquet2 fill:#4CAF50,color:#fff
+    style Delta2 fill:#2196F3,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">🗄️</span>JDBC Sources</h3>
+                    <p><strong>Reading from Database:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+df = spark.read.format("jdbc") \
+    .option("url", "jdbc:mysql://host:3306/db") \
+    .option("dbtable", "sales") \
+    .option("user", "admin") \
+    .option("password", "secret") \
+    .option("driver", "com.mysql.jdbc.Driver") \
+    .load()
+                    </pre>
+                    <p><strong>Parallel Reading:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+df = spark.read.jdbc(
+    url="jdbc:postgresql://host/db",
+    table="orders",
+    column="order_id",  # Partition column
+    lowerBound=1,
+    upperBound=1000000,
+    numPartitions=10,
+    properties={"user": "admin", "password": "pwd"}
+)
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📁</span>Parquet Format</h3>
+                    <p><strong>Why Parquet?</strong></p>
+                    <ul>
+                        <li>Columnar storage (read only needed columns)</li>
+                        <li>Built-in compression (snappy, gzip, lz4)</li>
+                        <li>Schema evolution support</li>
+                        <li>Predicate pushdown optimization</li>
+                        <li>10x faster than CSV/JSON</li>
+                    </ul>
+                    <p><strong>Usage:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+# Read
+df = spark.read.parquet("s3://bucket/data/*.parquet")
+
+# Write with partitioning
+df.write.mode("overwrite") \
+    .partitionBy("year", "month") \
+    .parquet("s3://bucket/output")
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📋</span>JSON & Semi-Structured Data</h3>
+                    <p><strong>Reading JSON:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+# Auto schema inference
+df = spark.read.json("data/*.json")
+
+# With schema
+from pyspark.sql.types import *
+
+schema = StructType([
+    StructField("id", IntegerType()),
+    StructField("name", StringType()),
+    StructField("tags", ArrayType(StringType()))
+])
+
+df = spark.read.schema(schema).json("data.json")
+                    </pre>
+                    <p><strong>Flattening Nested Data:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+from pyspark.sql.functions import explode
+
+# Explode arrays
+df.select("id", explode("tags").alias("tag"))
+
+# Access nested fields
+df.select("user.name", "user.email")
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔷</span>Delta Lake</h3>
+                    <p><strong>ACID Transactions for Data Lakes</strong></p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li><strong>ACID:</strong> Atomicity, Consistency, Isolation, Durability</li>
+                        <li><strong>Time Travel:</strong> Query historical data</li>
+                        <li><strong>Schema Evolution:</strong> Add/modify columns safely</li>
+                        <li><strong>Upserts:</strong> MERGE operations</li>
+                        <li><strong>Audit History:</strong> Full transaction log</li>
+                    </ul>
+                    <p><strong>Usage:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+# Write
+df.write.format("delta").save("/delta/table")
+
+# Read
+df = spark.read.format("delta").load("/delta/table")
+
+# Time Travel
+df = spark.read.format("delta") \
+    .option("versionAsOf", 5) \
+    .load("/delta/table")
+
+# MERGE (Upsert)
+deltaTable.alias("target").merge(
+    updates.alias("source"),
+    "target.id = source.id"
+).whenMatchedUpdate(set = {...}) \
+ .whenNotMatchedInsert(values = {...}) \
+ .execute()
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">☁️</span>Cloud Storage</h3>
+                    <p><strong>AWS S3:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+# Configure credentials
+spark.conf.set("spark.hadoop.fs.s3a.access.key", "KEY")
+spark.conf.set("spark.hadoop.fs.s3a.secret.key", "SECRET")
+
+# Read
+df = spark.read.parquet("s3a://bucket/path/")
+                    </pre>
+                    <p><strong>Azure Data Lake:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+# ADLS Gen2
+spark.conf.set("fs.azure.account.key.<account>.dfs.core.windows.net", "KEY")
+df = spark.read.parquet("abfss://container@account.dfs.core.windows.net/path")
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💡</span>Integration Best Practices</h3>
+                    <ul>
+                        <li><strong>Partitioning:</strong> Partition large tables for parallel reads</li>
+                        <li><strong>Pushdown:</strong> Leverage predicate and projection pushdown</li>
+                        <li><strong>Caching:</strong> Cache frequently accessed data</li>
+                        <li><strong>Compression:</strong> Always enable compression (snappy for speed, gzip for size)</li>
+                        <li><strong>Schema:</strong> Specify schema when possible (faster than inference)</li>
+                        <li><strong>Security:</strong> Use IAM roles instead of hardcoded credentials</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices for Data Sources</h3>
+                <ul>
+                    <li><strong>File Format Selection:</strong> Parquet for analytics, Avro for streaming, Delta for reliability</li>
+                    <li><strong>Partitioning Strategy:</strong> Partition by commonly filtered columns (e.g., date, region)</li>
+                    <li><strong>Avoid Small Files:</strong> Coalesce before writing: <code>df.coalesce(10).write.parquet(...)</code></li>
+                    <li><strong>JDBC Optimization:</strong> Use <code>numPartitions</code> for parallel reads</li>
+                    <li><strong>Cloud Storage:</strong> Use instance profiles/managed identities instead of keys</li>
+                    <li><strong>Delta Lake:</strong> Use for production data lakes (ACID + time travel)</li>
+                    <li><strong>Schema Management:</strong> Define schemas explicitly for production</li>
+                    <li><strong>Monitoring:</strong> Track read/write performance and adjust partitions</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 12. Cloud Deployments -->
+        <div class="architecture" id="cloud">
+            <h2>☁️ 12. Cloud Deployments</h2>
+            
+            <pre class="mermaid">
+flowchart TB
+    subgraph AWS["AWS Ecosystem"]
+        EMR[Amazon EMR<br/>Managed Spark]
+        S3AWS[S3 Storage]
+        Glue[AWS Glue<br/>Catalog]
+        Athena[Amazon Athena]
+    end
+    
+    subgraph Azure["Azure Ecosystem"]
+        Synapse[Azure Synapse<br/>Analytics]
+        Databricks[Azure Databricks]
+        ADLS2[Azure Data Lake<br/>Storage]
+        AML[Azure ML]
+    end
+    
+    subgraph GCP["Google Cloud Platform"]
+        Dataproc[Cloud Dataproc<br/>Managed Spark]
+        GCS2[Cloud Storage]
+        BigQuery[BigQuery]
+        VertexAI[Vertex AI]
+    end
+    
+    subgraph K8s2["Kubernetes"]
+        SparkK8s[Spark on K8s<br/>Container Orchestration]
+        Helm[Helm Charts]
+    end
+    
+    style EMR fill:#FF9900,color:#fff
+    style Synapse fill:#0078D4,color:#fff
+    style Dataproc fill:#4285F4,color:#fff
+    style SparkK8s fill:#326CE5,color:#fff
+            </pre>
+
+            <div class="details">
+                <div class="detail-card">
+                    <h3><span class="icon">🔶</span>AWS: Amazon EMR</h3>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>Managed Spark, Hadoop, Hive, Presto</li>
+                        <li>Auto-scaling clusters</li>
+                        <li>Spot instance support (70% cost savings)</li>
+                        <li>S3 as data lake storage</li>
+                        <li>EMR Notebooks (Jupyter-based)</li>
+                        <li>EMR Studio for collaborative development</li>
+                    </ul>
+                    <p><strong>Deployment:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+aws emr create-cluster \
+  --name "Spark Cluster" \
+  --release-label emr-6.10.0 \
+  --applications Name=Spark \
+  --instance-type m5.xlarge \
+  --instance-count 5 \
+  --use-default-roles
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔷</span>Azure: Synapse & Databricks</h3>
+                    <p><strong>Azure Synapse Analytics:</strong></p>
+                    <ul>
+                        <li>Unified analytics service</li>
+                        <li>Serverless and dedicated SQL pools</li>
+                        <li>Built-in Apache Spark pools</li>
+                        <li>Integration with Power BI</li>
+                        <li>Data integration pipelines</li>
+                    </ul>
+                    <p><strong>Azure Databricks:</strong></p>
+                    <ul>
+                        <li>Optimized Spark runtime (3x faster)</li>
+                        <li>Delta Lake native support</li>
+                        <li>MLflow integration</li>
+                        <li>Collaborative notebooks</li>
+                        <li>Auto-scaling clusters</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🌐</span>Google Cloud: Dataproc</h3>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>Fast cluster creation (90 seconds)</li>
+                        <li>Per-second billing</li>
+                        <li>Preemptible VMs (80% cost savings)</li>
+                        <li>BigQuery integration</li>
+                        <li>Vertex AI for ML workflows</li>
+                        <li>Component Gateway for UIs</li>
+                    </ul>
+                    <p><strong>Create Cluster:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+gcloud dataproc clusters create my-cluster \
+  --region us-central1 \
+  --master-machine-type n1-standard-4 \
+  --worker-machine-type n1-standard-4 \
+  --num-workers 2 \
+  --image-version 2.0-debian10
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">☸️</span>Kubernetes Deployment</h3>
+                    <p><strong>Why Kubernetes?</strong></p>
+                    <ul>
+                        <li>Cloud-agnostic deployment</li>
+                        <li>Container-based isolation</li>
+                        <li>Dynamic resource allocation</li>
+                        <li>CI/CD integration</li>
+                        <li>Multi-tenancy support</li>
+                    </ul>
+                    <p><strong>Submit to K8s:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.85em;">
+spark-submit \
+  --master k8s://https://k8s-master:443 \
+  --deploy-mode cluster \
+  --name spark-pi \
+  --conf spark.executor.instances=5 \
+  --conf spark.kubernetes.container.image=spark:3.4.0 \
+  --conf spark.kubernetes.namespace=spark \
+  local:///app/spark-pi.py
+                    </pre>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💰</span>Cost Optimization</h3>
+                    <ul>
+                        <li><strong>Spot/Preemptible Instances:</strong> 60-80% cost savings</li>
+                        <li><strong>Auto-Scaling:</strong> Scale down during idle periods</li>
+                        <li><strong>Cluster Shutdown:</strong> Terminate after job completion</li>
+                        <li><strong>Reserved Instances:</strong> For long-running workloads</li>
+                        <li><strong>Data Locality:</strong> Keep compute close to storage</li>
+                        <li><strong>Compression:</strong> Reduce storage and network costs</li>
+                    </ul>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🔒</span>Security Best Practices</h3>
+                    <ul>
+                        <li><strong>IAM Roles:</strong> Use managed identities (no hardcoded keys)</li>
+                        <li><strong>Encryption:</strong> Enable at-rest and in-transit encryption</li>
+                        <li><strong>Network Isolation:</strong> Use VPCs/VNets/VPCs</li>
+                        <li><strong>Secrets Management:</strong> AWS Secrets Manager, Azure Key Vault</li>
+                        <li><strong>Audit Logging:</strong> CloudTrail, Azure Monitor, Cloud Audit Logs</li>
+                        <li><strong>RBAC:</strong> Role-based access control</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3>🌟 Best Practices for Cloud Deployments</h3>
+                <ul>
+                    <li><strong>Infrastructure as Code:</strong> Use Terraform, CloudFormation, or ARM templates</li>
+                    <li><strong>Auto-Scaling:</strong> Enable for variable workloads to optimize costs</li>
+                    <li><strong>Monitoring:</strong> Set up CloudWatch, Azure Monitor, or Cloud Monitoring</li>
+                    <li><strong>Logging:</strong> Centralize logs in S3, ADLS, or GCS for analysis</li>
+                    <li><strong>Instance Types:</strong> Choose memory-optimized for Spark (r5, E-series, n1-highmem)</li>
+                    <li><strong>Data Locality:</strong> Run Spark in same region as data storage</li>
+                    <li><strong>Spot Instances:</strong> Use for non-critical or fault-tolerant workloads</li>
+                    <li><strong>Tagging:</strong> Tag resources for cost tracking and management</li>
+                    <li><strong>Disaster Recovery:</strong> Test backup and recovery procedures</li>
+                </ul>
+            </div>
+
+            <div class="dos-donts">
+                <div class="dos">
+                    <h3>✅ Do's</h3>
+                    <ul>
+                        <li>✓ Use managed services (EMR, Synapse, Dataproc)</li>
+                        <li>✓ Enable auto-scaling for cost optimization</li>
+                        <li>✓ Use spot/preemptible instances when possible</li>
+                        <li>✓ Implement comprehensive monitoring</li>
+                        <li>✓ Use IAM roles instead of access keys</li>
+                        <li>✓ Enable encryption at rest and in transit</li>
+                        <li>✓ Automate deployment with IaC</li>
+                        <li>✓ Set up budget alerts</li>
+                    </ul>
+                </div>
+                <div class="donts">
+                    <h3>❌ Don'ts</h3>
+                    <ul>
+                        <li>✗ Don't hardcode credentials in code</li>
+                        <li>✗ Don't leave clusters running when idle</li>
+                        <li>✗ Don't skip encryption for sensitive data</li>
+                        <li>✗ Don't ignore cost monitoring</li>
+                        <li>✗ Don't use default security groups</li>
+                        <li>✗ Don't deploy without disaster recovery plan</li>
+                        <li>✗ Don't mix regions for compute and storage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
