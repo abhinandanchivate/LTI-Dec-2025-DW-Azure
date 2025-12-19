@@ -1,0 +1,9 @@
+emp_id,name,salary,department
+101,John,60000,IT
+102,Alice,45000,HR
+103,Bob,70000,IT
+104,Carol,50000,Finance
+105,David,80000,Finance
+106,Eva,55000,HR
+107,Frank,30000,IT
+108,Grace,90000,Finance
