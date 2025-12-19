@@ -1,0 +1,7 @@
+emp_id,emp_name,dept_id,salary,dept_name,location
+101,Rahul,10,60000,Engineering,Bangalore
+102,Anita,20,55000,HR,Mumbai
+103,Vikram,30,70000,Finance,Delhi
+104,Pooja,40,50000,, 
+,,50,,Marketing,Pune
+,,60,,Support,Chennai
