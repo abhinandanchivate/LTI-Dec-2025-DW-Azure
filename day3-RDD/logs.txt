@@ -1,0 +1,9 @@
+INFO Application started successfully
+INFO User logged in: user1
+ERROR Database connection failed
+WARN Disk space is running low
+INFO User logged out: user1
+ERROR Failed to process request
+INFO Retrying connection
+ERROR Timeout while calling external API
+INFO Application stopped
