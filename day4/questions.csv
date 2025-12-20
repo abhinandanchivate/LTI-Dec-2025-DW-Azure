@@ -1,0 +1,165 @@
+Question,Option A,Option B,Option C,Option D,Correct Answer,Difficulty
+What is the fundamental unit of data in Spark?,RDD,DataFrame,Dataset,Partition,A,Average
+Which Spark component builds the logical execution plan?,Executor,Driver,DAG Scheduler,Task Scheduler,C,Average
+Which is NOT a Spark transformation?,map,filter,reduce,flatMap,C,Average
+Which Spark action triggers execution?,select,map,withColumn,show,D,Average
+RDDs are best described as?,Mutable collections,Distributed immutable collections,Local datasets,Streaming buffers,B,Average
+Which API provides schema enforcement?,RDD,DataFrame,Accumulator,Broadcast variable,B,Average
+What does lazy evaluation mean in Spark?,Immediate execution,Execution after each transformation,Execution only after an action,Execution on driver only,C,Average
+Which function converts RDD to DataFrame?,toDF(),createRDD(),parallelize(),makeDF(),A,Average
+What does sc.parallelize() do?,Reads HDFS,Creates RDD from local collection,Creates DataFrame,Creates Dataset,B,Average
+Which operation causes a shuffle?,map,filter,groupByKey,flatMap,C,Average
+Which is a wide transformation?,map,filter,groupBy,select,C,Average
+Which Spark API is type-safe?,RDD,DataFrame,Dataset,None,B,Average
+What is the default partitioner for Pair RDDs?,RangePartitioner,HashPartitioner,Custom,None,B,Average
+Which storage level stores data in memory only?,MEMORY_ONLY,DISK_ONLY,MEMORY_AND_DISK,OFF_HEAP,A,Average
+Which function removes duplicate rows in DataFrame?,unique(),distinct(),drop(),remove(),B,Average
+What does df.count() return?,Total columns,Total rows,Total partitions,Total stages,B,Average
+Which command shows DataFrame schema?,df.schema(),df.showSchema(),df.printSchema(),df.describe(),C,Average
+What is the role of Executor?,Job scheduling,Task execution,Plan creation,Resource allocation,B,Average
+Which API supports SQL queries?,RDD,Spark SQL,MLlib,GraphX,B,Average
+Which file format is columnar?,CSV,JSON,Parquet,TXT,C,Average
+What happens when cache() is called?,Immediate caching,Caching after action,Caching on disk only,Caching on driver,B,Average
+Which join avoids shuffle when small table is used?,Sort Merge Join,Shuffle Hash Join,Broadcast Join,Nested Loop Join,C,Average
+Which function applies a function to each row?,map,mapPartitions,foreach,reduce,A,Average
+Which DataFrame operation returns a new DataFrame?,show(),count(),collect(),select(),D,Average
+Which API is optimized using Catalyst?,RDD,DataFrame,Accumulator,Broadcast,B,Average
+What does df.collect() do?,Prints rows,Returns all data to driver,Counts rows,Caches data,B,Average
+Which transformation preserves partitioning?,map,filter,groupByKey,reduceByKey,B,Average
+Which is NOT a Spark cluster mode?,Local,Standalone,YARN,Mesos,Cassandra,D,Average
+Which operation is narrow?,map,groupBy,join,repartition,A,Average
+Which Spark UI port is default?,8080,4040,9090,7077,B,Average
+Which component handles task scheduling?,Driver,Executor,DAG Scheduler,Task Scheduler,D,Average
+Which is better than groupByKey for aggregation?,groupByKey,reduceByKey,map,filter,B,Average
+Which API is deprecated in Spark 3.x?,RDD,Dataset,SparkContext,HiveContext,D,Average
+Which function changes number of partitions?,map,coalesce,filter,select,B,Average
+Which Spark variable is read-only across nodes?,Accumulator,Broadcast,RDD,Dataset,B,Average
+Which DataFrame function adds a column?,withColumn,addColumn,append,insert,A,Average
+Which operation forces full shuffle?,coalesce,repartition,cache,filter,B,Average
+What does repartition() do?,Reduce partitions,Increase or decrease partitions,Cache data,Sort data,B,Average
+Which Spark library is used for machine learning?,MLlib,GraphX,Streaming,SQL,A,Average
+Which API handles graph processing?,SQL,MLlib,GraphX,Streaming,C,Average
+Which transformation changes data type?,map,mapPartitions,flatMap,filter,C,Average
+Which function returns first N rows?,head(),take(),limit(),all of these,D,Average
+Which Spark feature provides fault tolerance?,Replication,Lineage,Checkpointing,Backup,B,Average
+Which DataFrame join type returns only matches?,left,right,inner,outer,C,Average
+Which DataFrame function sorts data?,orderBy,groupBy,select,where,A,Average
+Which operation materializes lineage?,cache,checkpoint,collect,show,C,Average
+Which is true about RDD immutability?,Can be updated,Can be modified,Always immutable,Mutable with actions,C,Average
+Which Spark SQL function filters rows?,select,where,groupBy,orderBy,B,Average
+
+A Spark job contains?,One stage only,Multiple actions,Multiple stages,One task only,C,Hard
+Why is reduceByKey preferred over groupByKey?,Less memory usage,More shuffling,Slower execution,Driver-side aggregation,A,Hard
+What happens if no action is called?,Job executes partially,Job executes fully,Job does not execute,Job fails,C,Hard
+Which transformation causes shuffle?,map,filter,reduceByKey,flatMap,C,Hard
+Which join is fastest when one table is small?,Sort Merge Join,Broadcast Join,Shuffle Join,Cross Join,B,Hard
+What does Catalyst optimizer do?,Optimizes RDDs,Optimizes physical plans,Optimizes storage,Optimizes network,B,Hard
+Which API supports Tungsten engine?,RDD,DataFrame,Accumulator,Streaming,B,Hard
+What is task granularity?,Job level,Stage level,Partition level,Executor level,C,Hard
+What causes a new stage?,Narrow dependency,Wide dependency,Cache,Action,B,Hard
+Which is NOT a Spark scheduler?,DAG Scheduler,Task Scheduler,YARN Scheduler,FIFO Scheduler,C,Hard
+Which operation breaks pipeline?,map,filter,join,flatMap,C,Hard
+What does mapPartitions optimize?,Serialization,Function calls,Shuffling,Disk IO,B,Hard
+Which action is dangerous on large datasets?,count,show,collect,take,C,Hard
+What happens during shuffle?,Data stays local,Data moves across nodes,Only metadata moves,Driver aggregates,B,Hard
+Which storage level uses serialization?,MEMORY_ONLY,MEMORY_ONLY_SER,DISK_ONLY,OFF_HEAP,B,Hard
+What does checkpointing do?,Caches data,Breaks lineage,Optimizes joins,Improves shuffle,B,Hard
+Which DataFrame operation is executed first?,select,filter,optimized by Catalyst,withColumn,C,Hard
+Which join creates Cartesian product?,Inner,Cross,Left,Right,B,Hard
+Which partitioner minimizes skew?,HashPartitioner,RangePartitioner,RandomPartitioner,Custom,B,Hard
+What causes data skew?,Even distribution,Hot keys,Small datasets,Local mode,B,Hard
+Which is true about broadcast variables?,Writable,Read-only,Lazy loaded,Driver-only,B,Hard
+Which API supports strongly typed JVM objects?,RDD,Dataset,DataFrame,Spark SQL,B,Hard
+What is executor memory used for?,Only tasks,Only shuffle,Both execution and storage,Driver cache,C,Hard
+Which command shows physical plan?,df.plan(),df.explain(),df.debug(),df.query(),B,Hard
+Which transformation preserves ordering?,map,filter,sortByKey,flatMap,C,Hard
+Which Spark SQL join hint improves performance?,CACHE,BROADCAST,MERGE,SHUFFLE,B,Hard
+Which operation triggers recomputation?,cache failure,executor loss,action,shuffle,B,Hard
+Which is true about narrow dependency?,One-to-many,Many-to-one,One-to-one,Many-to-many,C,Hard
+Which API is optimized for SQL workloads?,RDD,Dataset,DataFrame,Streaming,C,Hard
+What does coalesce avoid?,Computation,Shuffle,Serialization,Disk IO,B,Hard
+Which function aggregates without shuffle?,groupByKey,reduceByKey,join,repartition,B,Hard
+Which Spark metric tracks task time?,Stage duration,Executor time,Task duration,Job duration,C,Hard
+Which causes job failure?,Executor loss,Driver failure,Task retry,Speculation,B,Hard
+Which Spark mode is best for production?,Local,Standalone,YARN,Client mode,C,Hard
+What does speculative execution handle?,Slow tasks,Failed jobs,Driver crash,Memory leak,A,Hard
+Which API is deprecated for streaming?,DStreams,Structured Streaming,Kafka API,None,A,Hard
+Which join strategy sorts both datasets?,Broadcast,Shuffle Hash,Sort Merge,Cross,C,Hard
+What does adaptive query execution do?,Static plans,Dynamic optimization,Manual tuning,Disable shuffle,B,Hard
+Which config controls shuffle partitions?,spark.executor.memory,spark.sql.shuffle.partitions,spark.driver.memory,spark.default.parallelism,B,Hard
+Which is true about DataFrame lineage?,Stored physically,Recomputed logically,Lost after action,Driver-only,B,Hard
+Which API uses encoders?,RDD,Dataset,DataFrame,SparkContext,B,Hard
+Which transformation changes partition count?,map,filter,coalesce,repartition,D,Hard
+Which Spark feature improves CPU efficiency?,Catalyst,Tungsten,MLlib,GraphX,B,Hard
+What will be the output of: rdd=sc.parallelize([1,2,3]).map(lambda x:x*2); rdd.collect()?,[1,2,3],[2,4,6],[1,4,9],Error,B,Average
+What does this return: sc.parallelize([1,2,3]).filter(lambda x:x>1).count()?,1,2,3,Error,B,Average
+What happens when this runs: rdd.map(lambda x:x+1) without action?,Executes immediately,Executes partially,Does not execute,Throws error,C,Average
+Output of: df.select("name").show()?,Returns DataFrame,Prints column,Triggers action,Returns list,C,Average
+What does this do: df.withColumn("age2",col("age")+1)?,Modifies df,Returns new df,Updates schema only,Throws error,B,Average
+What is output type of df.count()?,DataFrame,Integer,Long,Row,C,Average
+What happens: df.filter(col("age")>30).show()?,Lazy execution,Eager execution,Action triggered,Schema change,C,Average
+Output of: sc.parallelize([1,2,3]).map(lambda x:(x,x*x)).collect()?,[(1,1),(2,2),(3,3)],[(1,1),(2,4),(3,9)],Error,None,B,Average
+What does this do: df.drop("salary")?,Drops row,Drops column,Drops nulls,Error,B,Average
+Output type: df.select("name","age")?,RDD,DataFrame,List,Tuple,B,Average
+What happens: df.limit(5).count()?,Returns 5,Counts all rows,Counts limited rows,Error,C,Average
+What is result of rdd.take(2)?,Returns RDD,Returns list,Prints data,Error,B,Average
+What does this do: df.na.drop()?,Drops columns,Drops null rows,Fills nulls,Error,B,Average
+Which is action: df.select("age"),df.filter(),df.show(),df.withColumn(),C,Average
+What happens: df.cache() without action?,Caches immediately,Caches later,No effect,Error,B,Average
+What does this return: df.collect()?,RDD,List of Rows,DataFrame,Iterator,B,Average
+Output of: sc.parallelize([1,2]).flatMap(lambda x:[x,x*10]).collect()?,[1,2,10,20],[1,10,2,20],[1,2],[10,20],B,Average
+What happens: df.orderBy("age")?,Sorts immediately,Adds to plan,Triggers shuffle only on action,Error,C,Average
+What is output type: df.rdd?,DataFrame,RDD,Dataset,None,B,Average
+What happens: df.show(5)?,Returns DataFrame,Returns list,Prints 5 rows,Counts rows,C,Average
+What does this do: df.selectExpr("age*2 as age2")?,SQL expression,Adds column,Drops column,Error,A,Average
+What is output: sc.parallelize([]).count()?,0,None,Error,-1,A,Average
+What happens: df.filter(col("age")>30)?,Returns DataFrame,Executes filter,Returns list,Error,A,Average
+Which triggers execution: df.cache(),df.printSchema(),df.explain(),df.collect(),D,Average
+What does df.explain() show?,Data,Schema,Execution plan,Partitions,C,Average
+What happens: df.repartition(1)?,No change,Triggers shuffle,Reduces partitions lazily,Error,C,Average
+Output of: df.select(col("age")+1).show()?,Error,Adds 1 to age,New column only,Schema only,B,Average
+What does this do: df.withColumnRenamed("a","b")?,Rename column,Duplicate column,Drop column,Error,A,Average
+What happens: rdd.reduce(lambda a,b:a+b)?,Returns RDD,Returns sum,Returns list,Error,B,Average
+Output type: df.groupBy("dept").count()?,RDD,GroupedData,DataFrame,List,C,Average
+What does this do: df.distinct()?,Remove duplicates,Sort data,Remove nulls,Error,A,Average
+Which causes shuffle: df.filter(),df.map(),df.groupBy(),df.select(),C,Average
+What happens: df.coalesce(1).count()?,Shuffle,No shuffle,Error,Cache,B,Average
+What is returned: df.head()?,Row,List,DataFrame,RDD,A,Average
+What happens: df.na.fill(0)?,Drops nulls,Fills nulls,Error,No change,B,Average
+What does df.schema return?,DataFrame,String,StructType,List,C,Average
+What is output: df.select("age").rdd.collect()?,Rows,Tuples,Values,Error,A,Average
+What does this do: df.where(col("age")>30)?,Same as filter,Sorts data,Drops nulls,Error,A,Average
+What happens: df.join(df2,"id")?,No shuffle,Shuffle always,Broadcast always,Error,B,Average
+What happens: df.show() return?,None,DataFrame,List,Row,A,Average
+What does rdd.mapPartitions do?,Row-wise processing,Partition-wise processing,Shuffle data,Cache data,B,Hard
+What happens if df.collect() on huge data?,Optimized,Safe,Driver OOM,Shuffle,C,Hard
+What does this do: df.checkpoint()?,Cache only,Break lineage,Sort data,Error,B,Hard
+What happens: df.groupBy("k").agg(sum("v"))?,No shuffle,Shuffle,Driver aggregation,Error,B,Hard
+What does df.repartition(10) cause?,Narrow dependency,Wide dependency,No dependency,Error,B,Hard
+Which is better: reduceByKey vs groupByKey?,Same,reduceByKey,groupByKey,None,B,Hard
+What happens: df.cache(); df.count(); df.count()?,Recompute twice,Compute once,Error,Cache ignored,B,Hard
+What happens if executor fails?,Job fails,Stage retries,Driver fails,Silent ignore,B,Hard
+What does broadcast(df) do?,Cache df,Broadcast small df,Shuffle data,Error,B,Hard
+What does df.persist(MEMORY_AND_DISK) mean?,Only memory,Only disk,Memory then disk,Off heap,C,Hard
+What happens: df.sort("age") without action?,Sorts immediately,Lazy,Error,Cache,B,Hard
+What causes new stage?,Map,Filter,Join,Select,C,Hard
+What happens: df.union(df2) with different schema?,Align automatically,Error,Null fill,Ignore,B,Hard
+What does df.withColumn overwrite?,Row,Column,Schema,Partition,B,Hard
+What does df.rdd.map(lambda r:r[0]).collect() return?,Rows,Column values,DataFrame,Error,B,Hard
+What happens: df.join(df2,"id","cross")?,Cartesian join,Inner join,Left join,Error,A,Hard
+What does df.dropDuplicates(["id"])?,Remove all duplicates,Remove based on id,Sort data,Error,B,Hard
+What does df.select("age").distinct().count()?,Total rows,Unique ages,Error,Partitions,B,Hard
+What does df.sample(0.5) do?,Exact 50%,Approx sample,Shuffle data,Error,B,Hard
+What happens: df.limit(10).repartition(5)?,Limit then repartition,Repartition then limit,Error,Ignore,A,Hard
+What does df.sortWithinPartitions do?,Global sort,Local sort,Shuffle,Error,B,Hard
+What happens: df.explain(True)?,Logical plan only,Physical plan only,Both,None,C,Hard
+What causes skew?,Even keys,Hot keys,Small data,Cache,B,Hard
+What does df.toLocalIterator() do?,Collect all,Stream rows,Shuffle,Error,B,Hard
+What happens if spark.sql.shuffle.partitions=1?,Parallelism high,Single reducer,Error,No effect,B,Hard
+What happens: df.map(lambda x:x)? ,Works,Error,Returns RDD,Returns Dataset,B,Hard
+What happens: df.withColumn("c",lit(None))?,Null column,Error,Drops column,No change,A,Hard
+What does df.count() after filter do?,Counts filtered rows,Counts all rows,Error,Cache,A,Hard
+What happens: df.persist() without action?,Immediate persist,Lazy persist,Error,Disk only,B,Hard
+What does df.unpersist() do?,Deletes df,Removes cache,Stops job,Error,B,Hard
+What happens: df.join(df2,"id","left")?,Inner join,Left join,Right join,Error,B,Hard
+What happens: df.repartition(col("id"))?,Hash partition,Range partition,No change,Error,A,Hard
