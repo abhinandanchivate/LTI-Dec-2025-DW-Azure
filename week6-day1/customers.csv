@@ -1,0 +1,11 @@
+customer_id,customer_name,email,phone,city,registration_datetime,last_login_datetime,status,total_spent,loyalty_points
+C001,Rahul Sharma,rahul.sharma@gmail.com,9876543210,Pune,2024-01-10 09:15:00,2024-12-15 19:45:00,ACTIVE,12500,120
+C002,Anita Verma,anita.verma@gmail.com,9123456780,Mumbai,2023-11-05 14:30:00,2024-06-18 10:20:00,ACTIVE,8900,90
+C003,Sunil Patil,sunil.patil@gmail.com,9988776655,Nagpur,2024-02-20 08:50:00,,INACTIVE,3000,30
+C004,Meena Iyer,meena.iyer@gmail.com,9090909090,Chennai,2022-07-12 16:10:00,2024-12-01 21:05:00,ACTIVE,22000,220
+C005,Amit Joshi,amit.joshi@gmail.com,9011223344,Bangalore,2024-05-03 11:40:00,2024-05-20 18:30:00,ACTIVE,5400,55
+C006,Priya Singh,priya.singh@gmail.com,8899776655,Delhi,2023-03-15 10:00:00,2023-12-31 23:50:00,ACTIVE,15000,150
+C007,Kunal Mehta,kunal.mehta@gmail.com,7766554433,Ahmedabad,2024-08-01 09:05:00,,INACTIVE,0,0
+C008,Neha Kulkarni,neha.k@gmail.com,9988665544,Pune,2024-09-18 17:25:00,2024-12-20 20:10:00,ACTIVE,7600,80
+C009,Rohit Nair,rohit.nair@gmail.com,8877665544,Kochi,2023-06-22 13:15:00,2024-01-05 09:00:00,ACTIVE,9800,95
+C010,Pooja Desai,pooja.desai@gmail.com,9123987654,Surat,2024-12-01 07:45:00,2024-12-01 08:15:00,ACTIVE,1200,15
