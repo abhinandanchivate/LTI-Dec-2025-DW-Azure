@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark SQL Architecture - Complete Guide</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .diagram-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .diagram-section h2 {
+            color: #2a5298;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2a5298;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section h3 {
+            color: #1e3c72;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+            padding-left: 15px;
+            border-left: 4px solid #764ba2;
+        }
+
+        .section h4 {
+            color: #2a5298;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+        }
+
+        .section p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid #f39c12;
+        }
+
+        .highlight-box h4 {
+            color: #d35400;
+            margin-top: 0;
+        }
+
+        ul {
+            margin: 15px 0 15px 40px;
+        }
+
+        ul li {
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        .do-list li {
+            color: #27ae60;
+            font-weight: 500;
+        }
+
+        .dont-list li {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .do-list li::marker {
+            content: "✅ ";
+        }
+
+        .dont-list li::marker {
+            content: "❌ ";
+        }
+
+        .flow-steps {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .flow-steps ol {
+            margin-left: 20px;
+        }
+
+        .flow-steps ol li {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .component-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .component-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .component-card h4 {
+            color: #2a5298;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin: 5px 5px 5px 0;
+        }
+
+        .badge-why {
+            background: #ff7675;
+            color: white;
+        }
+
+        .badge-where {
+            background: #74b9ff;
+            color: white;
+        }
+
+        .badge-how {
+            background: #55efc4;
+            color: #2d3436;
+        }
+
+        .badge-when {
+            background: #fdcb6e;
+            color: #2d3436;
+        }
+
+        .badge-do {
+            background: #00b894;
+            color: white;
+        }
+
+        .badge-dont {
+            background: #d63031;
+            color: white;
+        }
+
+        footer {
+            background: #2d3436;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .section h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Spark SQL Architecture</h1>
+            <p>Complete Guide: Why, Where, How, When, Do's & Don'ts</p>
+        </header>
+
+        <div class="content">
+            <!-- Architecture Diagram -->
+            <div class="diagram-section">
+                <h2>📊 Complete Architecture Diagram</h2>
+                <div class="mermaid">
+graph TB
+    subgraph "Client Layer"
+        SQL[SQL Queries]
+        DF[DataFrame API]
+        DS[Dataset API]
+    end
+    
+    subgraph "Spark SQL Core"
+        CATALYST[Catalyst Optimizer]
+        PARSER[SQL Parser]
+        ANALYZER[Analyzer]
+        LOGICAL[Logical Plan]
+        OPTIMIZED[Optimized Logical Plan]
+        PHYSICAL[Physical Plans]
+        COST[Cost-Based Optimizer]
+        SELECTED[Selected Physical Plan]
+    end
+    
+    subgraph "Execution Engine"
+        TUNGSTEN[Tungsten Execution Engine]
+        CODEGEN[Whole-Stage Code Generation]
+        RDD[RDD Execution]
+    end
+    
+    subgraph "Data Sources"
+        HIVE[Hive Tables]
+        PARQUET[Parquet]
+        JSON[JSON]
+        CSV[CSV]
+        JDBC[JDBC Sources]
+        CUSTOM[Custom Data Sources]
+    end
+    
+    subgraph "Cluster Manager"
+        YARN[YARN]
+        MESOS[Mesos]
+        K8S[Kubernetes]
+        STANDALONE[Standalone]
+    end
+    
+    subgraph "Storage Layer"
+        HDFS[HDFS]
+        S3[S3]
+        BLOB[Azure Blob]
+        LOCAL[Local FS]
+    end
+    
+    SQL --> PARSER
+    DF --> PARSER
+    DS --> PARSER
+    
+    PARSER --> ANALYZER
+    ANALYZER --> LOGICAL
+    LOGICAL --> CATALYST
+    CATALYST --> OPTIMIZED
+    OPTIMIZED --> COST
+    COST --> PHYSICAL
+    PHYSICAL --> SELECTED
+    
+    SELECTED --> TUNGSTEN
+    TUNGSTEN --> CODEGEN
+    CODEGEN --> RDD
+    
+    RDD --> YARN
+    RDD --> MESOS
+    RDD --> K8S
+    RDD --> STANDALONE
+    
+    ANALYZER -.->|Metadata| HIVE
+    ANALYZER -.->|Metadata| PARQUET
+    ANALYZER -.->|Metadata| JSON
+    ANALYZER -.->|Metadata| CSV
+    ANALYZER -.->|Metadata| JDBC
+    ANALYZER -.->|Metadata| CUSTOM
+    
+    RDD -.->|Read/Write| HDFS
+    RDD -.->|Read/Write| S3
+    RDD -.->|Read/Write| BLOB
+    RDD -.->|Read/Write| LOCAL
+    
+    style CATALYST fill:#ff9999
+    style TUNGSTEN fill:#99ccff
+    style PARSER fill:#99ff99
+    style CODEGEN fill:#ffcc99
+                </div>
+            </div>
+
+            <!-- WHY Section -->
+            <div class="section">
+                <h2><span class="badge badge-why">WHY</span> Purpose & Reasoning</h2>
+                
+                <h3>Why Spark SQL Exists</h3>
+                <ul>
+                    <li><strong>Unified Analytics:</strong> Combines SQL queries with complex data processing in a single engine, eliminating the need for multiple tools</li>
+                    <li><strong>Performance:</strong> Achieves 100x faster processing than traditional MapReduce through in-memory computing and advanced optimization</li>
+                    <li><strong>Ease of Use:</strong> Provides familiar SQL interface for data scientists and analysts who aren't programmers</li>
+                    <li><strong>Integration:</strong> Works seamlessly with existing Hadoop/Hive infrastructure, enabling smooth migration</li>
+                    <li><strong>Optimization:</strong> Catalyst optimizer automatically improves query performance without manual tuning</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <h4>💡 Key Insight</h4>
+                    <p>Spark SQL bridges the gap between traditional SQL databases and big data processing, making large-scale analytics accessible to a broader audience while maintaining high performance.</p>
+                </div>
+            </div>
+
+            <!-- WHERE Section -->
+            <div class="section">
+                <h2><span class="badge badge-where">WHERE</span> Component Placement & Location</h2>
+
+                <div class="component-grid">
+                    <div class="component-card">
+                        <h4>1. Client Layer</h4>
+                        <p><strong>Location:</strong> Driver node or client applications</p>
+                        <p><strong>Components:</strong> SQL, DataFrame API, Dataset API</p>
+                        <p><strong>Purpose:</strong> Entry points for user queries and programs</p>
+                    </div>
+
+                    <div class="component-card">
+                        <h4>2. Spark SQL Core</h4>
+                        <p><strong>Location:</strong> Driver node</p>
+                        <p><strong>Components:</strong> Catalyst Optimizer, Parser, Analyzer, Planner</p>
+                        <p><strong>Purpose:</strong> Query optimization and execution planning</p>
+                    </div>
+
+                    <div class="component-card">
+                        <h4>3. Execution Engine</h4>
+                        <p><strong>Location:</strong> Executor nodes across cluster</p>
+                        <p><strong>Components:</strong> Tungsten, Code Generation, RDD</p>
+                        <p><strong>Purpose:</strong> Actual data processing and computation</p>
+                    </div>
+
+                    <div class="component-card">
+                        <h4>4. Data Sources</h4>
+                        <p><strong>Location:</strong> External systems (HDFS, S3, Databases)</p>
+                        <p><strong>Components:</strong> Various format readers/writers</p>
+                        <p><strong>Purpose:</strong> Data input/output and storage</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HOW Section -->
+            <div class="section">
+                <h2><span class="badge badge-how">HOW</span> Mechanism & Working</h2>
+
+                <h3>Query Execution Flow</h3>
+                <div class="flow-steps">
+                    <ol>
+                        <li><strong>Parsing:</strong> Converts SQL/DataFrame/Dataset into an Unresolved Logical Plan (abstract syntax tree)</li>
+                        <li><strong>Analysis:</strong> Validates schemas, resolves column references using catalog metadata</li>
+                        <li><strong>Logical Optimization:</strong> Applies rule-based optimizations like predicate pushdown, constant folding, and column pruning</li>
+                        <li><strong>Physical Planning:</strong> Generates multiple candidate physical execution plans</li>
+                        <li><strong>Cost-Based Optimization:</strong> Selects the most efficient plan using statistical analysis and cost models</li>
+                        <li><strong>Code Generation:</strong> Whole-stage codegen creates optimized Java bytecode for execution</li>
+                        <li><strong>Execution:</strong> Tungsten engine executes the plan across the cluster with optimized memory management</li>
+                    </ol>
+                </div>
+
+                <h3>Key Technologies</h3>
+                <ul>
+                    <li><strong>Catalyst Optimizer:</strong> Combines rule-based (60+ optimization rules) and cost-based optimization strategies</li>
+                    <li><strong>Tungsten Engine:</strong> Provides off-heap memory management, cache-friendly computation, and binary in-memory format</li>
+                    <li><strong>Whole-Stage Code Generation:</strong> Eliminates virtual function calls and improves CPU efficiency by generating specialized code</li>
+                    <li><strong>Data Source API:</strong> Enables pluggable data sources with pushdown optimizations</li>
+                </ul>
+            </div>
+
+            <!-- WHEN Section -->
+            <div class="section">
+                <h2><span class="badge badge-when">WHEN</span> Use Cases & Scenarios</h2>
+
+                <h3>Use Spark SQL When:</h3>
+                <ul>
+                    <li>Processing large datasets in the terabyte to petabyte range</li>
+                    <li>Need both batch and streaming analytics in unified framework</li>
+                    <li>Migrating from Hive with minimal code changes required</li>
+                    <li>Building complex ETL pipelines combining SQL with custom transformations</li>
+                    <li>Performing interactive analytics on big data warehouses</li>
+                    <li>Feature engineering for machine learning at scale</li>
+                    <li>Querying data lakes with multiple formats (Parquet, ORC, JSON, CSV)</li>
+                    <li>Real-time reporting and dashboards on streaming data</li>
+                </ul>
+
+                <h3>Timing Considerations</h3>
+                <ul>
+                    <li><strong>Development Phase:</strong> Design schema and partitioning strategy before optimization</li>
+                    <li><strong>Execution Time:</strong> Cache intermediate results for iterative algorithms</li>
+                    <li><strong>Production Deployment:</strong> Monitor query plans regularly for performance regression</li>
+                    <li><strong>Maintenance Windows:</strong> Compact small files, update statistics periodically</li>
+                </ul>
+            </div>
+
+            <!-- DO's Section -->
+            <div class="section">
+                <h2><span class="badge badge-do">DO's</span> Best Practices</h2>
+
+                <h3>1. Query Optimization</h3>
+                <ul class="do-list">
+                    <li>Use DataFrame/Dataset API over RDD API for better optimization</li>
+                    <li>Leverage partitioning with bucketing and partitionBy for large tables</li>
+                    <li>Cache frequently accessed data using df.cache() or df.persist()</li>
+                    <li>Use broadcast joins for small tables (typically under 10MB)</li>
+                    <li>Filter data as early as possible to enable predicate pushdown</li>
+                    <li>Select only required columns to benefit from projection pushdown</li>
+                </ul>
+
+                <h3>2. Data Format Selection</h3>
+                <ul class="do-list">
+                    <li>Use Parquet or ORC for columnar storage and better compression</li>
+                    <li>Enable appropriate compression (Snappy for speed, ZSTD for size)</li>
+                    <li>Partition data by frequently filtered columns (date, region, category)</li>
+                    <li>Use appropriate file sizes (128MB-1GB per file)</li>
+                </ul>
+
+                <h3>3. Configuration Tuning</h3>
+                <ul class="do-list">
+                    <li>Tune spark.sql.shuffle.partitions based on data size (default 200)</li>
+                    <li>Enable Adaptive Query Execution (AQE) for dynamic optimization</li>
+                    <li>Configure executor and driver memory based on workload</li>
+                    <li>Use dynamic allocation for variable workloads</li>
+                    <li>Set appropriate parallelism levels for your cluster</li>
+                </ul>
+
+                <h3>4. Development Practices</h3>
+                <ul class="do-list">
+                    <li>Collect table statistics using ANALYZE TABLE ... COMPUTE STATISTICS</li>
+                    <li>Use explain() to inspect and verify query execution plans</li>
+                    <li>Persist intermediate results in multi-stage jobs</li>
+                    <li>Monitor Spark UI to identify bottlenecks and skew</li>
+                    <li>Write unit tests for transformations</li>
+                </ul>
+
+                <h3>5. Schema Management</h3>
+                <ul class="do-list">
+                    <li>Define schemas explicitly in production (avoid inferSchema)</li>
+                    <li>Use appropriate data types to minimize storage</li>
+                    <li>Handle null values properly with coalesce or fillna</li>
+                    <li>Document schema changes and maintain version control</li>
+                </ul>
+            </div>
+
+            <!-- DON'Ts Section -->
+            <div class="section">
+                <h2><span class="badge badge-dont">DON'Ts</span> Things to Avoid</h2>
+
+                <h3>1. Performance Killers</h3>
+                <ul class="dont-list">
+                    <li>Use UDFs unnecessarily (they break Catalyst optimization pipeline)</li>
+                    <li>Call collect() on large datasets (brings everything to driver memory)</li>
+                    <li>Create too many small files (causes file system overhead)</li>
+                    <li>Use cartesian joins unless absolutely necessary</li>
+                    <li>Skip partitioning for tables larger than a few gigabytes</li>
+                </ul>
+
+                <h3>2. Memory Management Issues</h3>
+                <ul class="dont-list">
+                    <li>Broadcast tables larger than 2GB (default broadcast threshold)</li>
+                    <li>Cache excessively without monitoring memory usage</li>
+                    <li>Ignore shuffle spill warnings in Spark UI</li>
+                    <li>Use wide transformations without proper repartitioning</li>
+                </ul>
+
+                <h3>3. Code Anti-Patterns</h3>
+                <ul class="dont-list">
+                    <li>Iterate through DataFrame row-by-row (use vectorized operations)</li>
+                    <li>Perform unnecessary type conversions</li>
+                    <li>Chain too many actions without intermediate persistence</li>
+                    <li>Use nested loops inside UDFs</li>
+                    <li>Mix RDD and DataFrame operations unnecessarily</li>
+                </ul>
+
+                <h3>4. Data Management Mistakes</h3>
+                <ul class="dont-list">
+                    <li>Write output to the same location being read (use temporary paths)</li>
+                    <li>Use CSV format in production (slow, no schema enforcement)</li>
+                    <li>Skip data validation and quality checks</li>
+                    <li>Hardcode file paths and configurations in code</li>
+                </ul>
+
+                <h3>5. Production Pitfalls</h3>
+                <ul class="dont-list">
+                    <li>Ignore query plan changes between Spark versions</li>
+                    <li>Use default configurations in production environments</li>
+                    <li>Skip monitoring, logging, and alerting setup</li>
+                    <li>Create single points of failure without redundancy</li>
+                    <li>Deploy without proper testing at scale</li>
+                </ul>
+            </div>
+
+            <!-- Key Components -->
+            <div class="section">
+                <h2>🔧 Key Architecture Components</h2>
+
+                <h3>Catalyst Optimizer</h3>
+                <p>The heart of Spark SQL's performance capabilities:</p>
+                <ul>
+                    <li><strong>Rule-Based Optimization:</strong> Over 60 built-in rules for logical plan optimization</li>
+                    <li><strong>Cost-Based Optimization:</strong> Uses table statistics to choose optimal join strategies</li>
+                    <li><strong>Extensible Framework:</strong> Allows custom optimization rules for domain-specific needs</li>
+                    <li><strong>Query Rewriting:</strong> Transforms inefficient patterns into optimal equivalents</li>
+                </ul>
+
+                <h3>Tungsten Execution Engine</h3>
+                <p>Advanced execution engine for maximum performance:</p>
+                <ul>
+                    <li><strong>Binary Format:</strong> Compact in-memory representation of data</li>
+                    <li><strong>Off-Heap Memory:</strong> Reduces garbage collection overhead</li>
+                    <li><strong>Cache-Aware Algorithms:</strong> Optimized for modern CPU architectures</li>
+                    <li><strong>Code Generation:</strong> Produces specialized bytecode for each query</li>
+                </ul>
+
+                <h3>Data Source API</h3>
+                <p>Flexible integration with various storage systems:</p>
+                <ul>
+                    <li><strong>Pluggable Architecture:</strong> Easy integration of new data sources</li>
+                    <li><strong>Predicate Pushdown:</strong> Filters applied at source level</li>
+                    <li><strong>Column Pruning:</strong> Only required columns read from storage</li>
+                    <li><strong>Statistics Collection:</strong> Metadata for query optimization</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Spark SQL Architecture Guide | Comprehensive Reference for Big Data Processing</p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>
