@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PySpark Streaming: Complete Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Work+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1d4a;
+            --secondary: #2e4a7c;
+            --accent: #ff6b6b;
+            --light-bg: #f8f9fa;
+            --code-bg: #282c34;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555;
+            --border: #e0e0e0;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --info: #2196f3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .hero h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            font-weight: 300;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.95;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 50px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--accent);
+            font-weight: 700;
+        }
+
+        h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            color: var(--secondary);
+            margin: 40px 0 20px 0;
+            font-weight: 600;
+        }
+
+        h4 {
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1.4rem;
+            color: var(--secondary);
+            margin: 30px 0 15px 0;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+            border-left: 5px solid var(--accent);
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #d0e7f9 100%);
+            border-left: 5px solid var(--info);
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #d7f0d9 100%);
+            border-left: 5px solid var(--success);
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe4c4 100%);
+            border-left: 5px solid var(--warning);
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        ul, ol {
+            margin: 20px 0 20px 40px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            overflow-x: auto;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #abb2bf;
+        }
+
+        .code-header {
+            background: #21252b;
+            color: #7d8799;
+            padding: 12px 20px;
+            border-radius: 12px 12px 0 0;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: -12px;
+        }
+
+        .keyword { color: #c678dd; }
+        .string { color: #98c379; }
+        .function { color: #61afef; }
+        .comment { color: #5c6370; font-style: italic; }
+        .number { color: #d19a66; }
+        .operator { color: #56b6c2; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: var(--light-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: var(--light-bg);
+        }
+
+        .architecture-diagram {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .flow-step {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .toc {
+            background: var(--light-bg);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            border: 2px solid var(--border);
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .toc ul {
+            margin-left: 20px;
+        }
+
+        .toc a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: var(--accent);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .section {
+                padding: 30px 20px;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            h2 {
+                font-size: 2rem;
+            }
+        }
+
+        strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>⚡ PySpark Streaming</h1>
+        <p>Comprehensive Guide to Real-Time Big Data Processing with Apache Spark</p>
+    </div>
+
+    <div class="container">
+        <div class="toc">
+            <h3>📑 Table of Contents</h3>
+            <ul>
+                <li><a href="#what">What is PySpark Streaming?</a></li>
+                <li><a href="#why">Why Use PySpark Streaming?</a></li>
+                <li><a href="#when">When to Use PySpark Streaming?</a></li>
+                <li><a href="#how">How Does PySpark Streaming Work?</a></li>
+                <li><a href="#architecture">Architecture & Core Concepts</a></li>
+                <li><a href="#types">Types of Streaming in PySpark</a></li>
+                <li><a href="#dstreams">DStreams (Legacy)</a></li>
+                <li><a href="#structured">Structured Streaming</a></li>
+                <li><a href="#examples">Complete Examples</a></li>
+                <li><a href="#sources">Data Sources & Sinks</a></li>
+                <li><a href="#operations">Stream Operations</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </div>
+
+        <div id="what" class="section">
+            <h2>🎯 What is PySpark Streaming?</h2>
+            <p>PySpark Streaming is the real-time data processing component of Apache Spark that enables scalable, high-throughput, fault-tolerant stream processing of live data streams. It is the Python API for Spark Streaming, allowing Python developers to process real-time data using familiar Spark concepts.</p>
+
+            <div class="highlight-box">
+                <h4>Key Definition</h4>
+                <p><strong>PySpark Streaming</strong> extends the core Spark API to enable processing of continuous data streams, treating streaming computations as a series of small, deterministic batch jobs on micro-batches of data.</p>
+            </div>
+
+            <h3>Core Characteristics</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>🔄 Micro-Batch Processing</h4>
+                    <p>Processes data in small batches (typically 1-10 seconds), combining the benefits of batch and stream processing</p>
+                </div>
+                <div class="card">
+                    <h4>🛡️ Fault Tolerance</h4>
+                    <p>Automatic recovery from failures through lineage information and checkpointing</p>
+                </div>
+                <div class="card">
+                    <h4>📊 Unified API</h4>
+                    <p>Same APIs for batch and streaming, enabling code reuse and easy migration</p>
+                </div>
+                <div class="card">
+                    <h4>⚡ Scalability</h4>
+                    <p>Can process millions of events per second across distributed clusters</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="why" class="section">
+            <h2>💡 Why Use PySpark Streaming?</h2>
+            
+            <h3>Advantages</h3>
+            <ul>
+                <li><strong>Unified Framework:</strong> Process both batch and streaming data using the same codebase and APIs</li>
+                <li><strong>High Throughput:</strong> Designed to handle massive volumes of data with low latency</li>
+                <li><strong>Fault Tolerance:</strong> Automatically recovers from worker failures without data loss</li>
+                <li><strong>Integration:</strong> Seamlessly integrates with Spark's ecosystem (Spark SQL, MLlib, GraphX)</li>
+                <li><strong>Multiple Sources:</strong> Supports Kafka, Flume, Kinesis, TCP sockets, and more</li>
+                <li><strong>State Management:</strong> Built-in support for stateful operations and windowing</li>
+                <li><strong>Exactly-Once Semantics:</strong> Ensures each record is processed exactly once (Structured Streaming)</li>
+                <li><strong>Python Support:</strong> Full Python API for easy development and integration</li>
+            </ul>
+
+            <h3>Use Case Scenarios</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>📈 Real-Time Analytics</h4>
+                    <p>Live dashboards, KPI monitoring, trend analysis, and business intelligence</p>
+                </div>
+                <div class="card">
+                    <h4>🔍 Fraud Detection</h4>
+                    <p>Real-time anomaly detection in financial transactions, insurance claims, or login attempts</p>
+                </div>
+                <div class="card">
+                    <h4>🎯 Recommendation Systems</h4>
+                    <p>Real-time personalization based on user behavior and interactions</p>
+                </div>
+                <div class="card">
+                    <h4>📱 IoT Data Processing</h4>
+                    <p>Processing sensor data, telemetry, and device logs in real-time</p>
+                </div>
+                <div class="card">
+                    <h4>📊 ETL Pipelines</h4>
+                    <p>Continuous data ingestion, transformation, and loading</p>
+                </div>
+                <div class="card">
+                    <h4>🔔 Alert Systems</h4>
+                    <p>Real-time monitoring and alerting for system metrics and business events</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="when" class="section">
+            <h2>⏰ When to Use PySpark Streaming?</h2>
+
+            <div class="success-box">
+                <h4>✅ Use PySpark Streaming When:</h4>
+                <ul>
+                    <li>You need to process continuous data streams in real-time</li>
+                    <li>Data arrives from multiple sources simultaneously</li>
+                    <li>You require scalability to handle increasing data volumes</li>
+                    <li>Fault tolerance and reliability are critical</li>
+                    <li>You need to perform complex transformations or aggregations on streaming data</li>
+                    <li>Integration with other Spark components (ML, SQL) is needed</li>
+                    <li>Latency requirements are in the range of seconds (not milliseconds)</li>
+                    <li>You want to unify batch and streaming code</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ Consider Alternatives When:</h4>
+                <ul>
+                    <li><strong>Sub-second Latency:</strong> If you need millisecond-level latency, consider Apache Flink or Apache Storm</li>
+                    <li><strong>Simple Event Processing:</strong> For basic stream processing, AWS Kinesis or Google Cloud Dataflow might be simpler</li>
+                    <li><strong>Small-Scale Applications:</strong> If data volume is small, traditional message queues might suffice</li>
+                    <li><strong>Complex Event Processing (CEP):</strong> For pattern detection over event streams, specialized CEP engines might be better</li>
+                </ul>
+            </div>
+
+            <h3>Latency vs Throughput Trade-off</h3>
+            <table>
+                <tr>
+                    <th>Processing Type</th>
+                    <th>Latency</th>
+                    <th>Throughput</th>
+                    <th>Best For</th>
+                </tr>
+                <tr>
+                    <td>PySpark Streaming</td>
+                    <td>1-10 seconds</td>
+                    <td>Very High</td>
+                    <td>High-volume analytics, ETL</td>
+                </tr>
+                <tr>
+                    <td>Apache Flink</td>
+                    <td>Milliseconds</td>
+                    <td>High</td>
+                    <td>Low-latency event processing</td>
+                </tr>
+                <tr>
+                    <td>Apache Storm</td>
+                    <td>Milliseconds</td>
+                    <td>Medium-High</td>
+                    <td>Real-time computation</td>
+                </tr>
+                <tr>
+                    <td>Kafka Streams</td>
+                    <td>Milliseconds</td>
+                    <td>High</td>
+                    <td>Kafka-centric applications</td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="how" class="section">
+            <h2>⚙️ How Does PySpark Streaming Work?</h2>
+
+            <h3>Fundamental Concept: Micro-Batch Architecture</h3>
+            <p>PySpark Streaming divides the continuous stream of data into small batches (micro-batches) and processes each batch as a separate Spark job. This approach combines the benefits of both batch and stream processing.</p>
+
+            <div class="architecture-diagram">
+                <h3 style="margin-top: 0;">🏗️ Streaming Processing Flow</h3>
+                <div class="flow-step">
+                    <strong>1. Data Ingestion</strong>
+                    <p>Continuous data arrives from sources (Kafka, Kinesis, sockets, files)</p>
+                </div>
+                <div style="font-size: 2rem; margin: 10px 0;">⬇️</div>
+                <div class="flow-step">
+                    <strong>2. Micro-Batch Creation</strong>
+                    <p>Receiver or Direct API collects data and creates micro-batches (e.g., every 2 seconds)</p>
+                </div>
+                <div style="font-size: 2rem; margin: 10px 0;">⬇️</div>
+                <div class="flow-step">
+                    <strong>3. Distributed Processing</strong>
+                    <p>Each micro-batch is processed as an RDD/DataFrame across the cluster</p>
+                </div>
+                <div style="font-size: 2rem; margin: 10px 0;">⬇️</div>
+                <div class="flow-step">
+                    <strong>4. Output Generation</strong>
+                    <p>Results are written to output sinks (databases, files, dashboards)</p>
+                </div>
+                <div style="font-size: 2rem; margin: 10px 0;">⬇️</div>
+                <div class="flow-step">
+                    <strong>5. Checkpointing</strong>
+                    <p>State and metadata are saved for fault tolerance</p>
+                </div>
+            </div>
+
+            <h3>Processing Model</h3>
+            <div class="info-box">
+                <h4>Time-Based Batching</h4>
+                <p>Streaming data is divided into batches based on time intervals called <strong>batch intervals</strong>. For example, with a batch interval of 2 seconds, data received during each 2-second window is processed as a single batch.</p>
+                <pre style="background: white; color: #333; padding: 15px; border-radius: 8px; margin-top: 15px;">
+Time:  [0-2s]  [2-4s]  [4-6s]  [6-8s]
+Data:  Batch1  Batch2  Batch3  Batch4
+       ↓       ↓       ↓       ↓
+       Process Process Process Process</pre>
+            </div>
+        </div>
+
+        <div id="architecture" class="section">
+            <h2>🏛️ Architecture & Core Concepts</h2>
+
+            <h3>Key Components</h3>
+
+            <h4>1. StreamingContext</h4>
+            <p>The entry point for all streaming functionality. It connects to a cluster and coordinates the execution of streaming queries.</p>
+
+            <h4>2. DStream (Discretized Stream)</h4>
+            <p>The basic abstraction in DStreams API representing a continuous stream of data. Internally, it's a sequence of RDDs.</p>
+
+            <h4>3. DataFrame/Dataset (Structured Streaming)</h4>
+            <p>Higher-level abstraction representing a streaming table with schema, enabling SQL-like operations.</p>
+
+            <h4>4. Receivers</h4>
+            <p>Long-running tasks that receive data from sources and store it in Spark's memory for processing.</p>
+
+            <h4>5. Transformations</h4>
+            <p>Operations on DStreams/DataFrames that create new streams (map, filter, reduce, etc.)</p>
+
+            <h4>6. Output Operations</h4>
+            <p>Operations that write data to external systems (print, saveAsTextFiles, foreachRDD, etc.)</p>
+
+            <h3>Execution Model</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>Driver Program</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>Creates StreamingContext</li>
+                        <li>Defines transformations</li>
+                        <li>Schedules jobs</li>
+                        <li>Manages checkpoints</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Executors</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>Receive data from sources</li>
+                        <li>Store data in memory</li>
+                        <li>Execute transformations</li>
+                        <li>Write results to sinks</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Fault Tolerance Mechanisms</h3>
+            <table>
+                <tr>
+                    <th>Mechanism</th>
+                    <th>Purpose</th>
+                    <th>How It Works</th>
+                </tr>
+                <tr>
+                    <td><strong>Write-Ahead Logs (WAL)</strong></td>
+                    <td>Prevent data loss</td>
+                    <td>Stores received data in fault-tolerant storage before processing</td>
+                </tr>
+                <tr>
+                    <td><strong>Checkpointing</strong></td>
+                    <td>Save state & metadata</td>
+                    <td>Periodically saves DStream metadata and RDD state to HDFS/S3</td>
+                </tr>
+                <tr>
+                    <td><strong>Lineage Information</strong></td>
+                    <td>Recompute lost data</td>
+                    <td>Tracks transformations to rebuild lost RDDs</td>
+                </tr>
+                <tr>
+                    <td><strong>Reliable Receivers</strong></td>
+                    <td>Acknowledge data</td>
+                    <td>Only acknowledge data after successful storage</td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="types" class="section">
+            <h2>🔄 Types of Streaming in PySpark</h2>
+
+            <p>PySpark offers two main APIs for stream processing, each with different characteristics and use cases:</p>
+
+            <h3>Comparison Overview</h3>
+            <table>
+                <tr>
+                    <th>Feature</th>
+                    <th>DStreams (Legacy)</th>
+                    <th>Structured Streaming (Recommended)</th>
+                </tr>
+                <tr>
+                    <td><strong>Introduction</strong></td>
+                    <td>Spark 0.9 (2013)</td>
+                    <td>Spark 2.0 (2016)</td>
+                </tr>
+                <tr>
+                    <td><strong>API Level</strong></td>
+                    <td>Low-level (RDD-based)</td>
+                    <td>High-level (DataFrame/Dataset)</td>
+                </tr>
+                <tr>
+                    <td><strong>Programming Model</strong></td>
+                    <td>Functional transformations</td>
+                    <td>Declarative SQL-like</td>
+                </tr>
+                <tr>
+                    <td><strong>Processing Guarantee</strong></td>
+                    <td>At-least-once</td>
+                    <td>Exactly-once</td>
+                </tr>
+                <tr>
+                    <td><strong>State Management</strong></td>
+                    <td>Manual (updateStateByKey)</td>
+                    <td>Built-in (groupBy, windows)</td>
+                </tr>
+                <tr>
+                    <td><strong>Event Time Support</strong></td>
+                    <td>Limited</td>
+                    <td>Full support with watermarks</td>
+                </tr>
+                <tr>
+                    <td><strong>Schema Enforcement</strong></td>
+                    <td>No</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Current Status</strong></td>
+                    <td>Maintenance mode</td>
+                    <td>Active development</td>
+                </tr>
+            </table>
+
+            <div class="highlight-box">
+                <h4>🎯 Recommendation</h4>
+                <p><strong>Use Structured Streaming for all new projects.</strong> It provides better performance, simpler APIs, exactly-once guarantees, and full event-time support. DStreams are only recommended for maintaining legacy applications.</p>
+            </div>
+        </div>
+
+        <div id="dstreams" class="section">
+            <h2>📊 DStreams (Discretized Streams)</h2>
+
+            <p>DStreams is the original streaming API in Spark, representing a continuous sequence of RDDs. While now in maintenance mode, understanding DStreams is important for legacy code.</p>
+
+            <h3>Core Concepts</h3>
+            <ul>
+                <li><strong>DStream:</strong> A sequence of RDDs representing a continuous stream</li>
+                <li><strong>Batch Interval:</strong> Time interval for creating micro-batches</li>
+                <li><strong>Window Operations:</strong> Operations over a sliding window of time</li>
+                <li><strong>Stateful Operations:</strong> Maintain state across batches</li>
+            </ul>
+
+            <h3>Common Transformations</h3>
+            <table>
+                <tr>
+                    <th>Operation</th>
+                    <th>Description</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td><code>map(func)</code></td>
+                    <td>Transform each element</td>
+                    <td><code>stream.map(lambda x: x * 2)</code></td>
+                </tr>
+                <tr>
+                    <td><code>flatMap(func)</code></td>
+                    <td>Transform and flatten</td>
+                    <td><code>stream.flatMap(lambda x: x.split())</code></td>
+                </tr>
+                <tr>
+                    <td><code>filter(func)</code></td>
+                    <td>Filter elements</td>
+                    <td><code>stream.filter(lambda x: x > 10)</code></td>
+                </tr>
+                <tr>
+                    <td><code>reduceByKey(func)</code></td>
+                    <td>Aggregate by key</td>
+                    <td><code>pairs.reduceByKey(lambda a,b: a+b)</code></td>
+                </tr>
+                <tr>
+                    <td><code>window()</code></td>
+                    <td>Window operations</td>
+                    <td><code>stream.window(20, 10)</code></td>
+                </tr>
+                <tr>
+                    <td><code>updateStateByKey()</code></td>
+                    <td>Maintain state</td>
+                    <td><code>stream.updateStateByKey(updateFunc)</code></td>
+                </tr>
+            </table>
+
+            <h3>DStreams Example - Word Count</h3>
+            <div class="code-header">python - dstreams_wordcount.py</div>
+            <div class="code-block">
+<pre><span class="keyword">from</span> pyspark <span class="keyword">import</span> SparkContext
+<span class="keyword">from</span> pyspark.streaming <span class="keyword">import</span> StreamingContext
+
+<span class="comment"># Create SparkContext</span>
+sc = <span class="function">SparkContext</span>(<span class="string">"local[2]"</span>, <span class="string">"NetworkWordCount"</span>)
+sc.setLogLevel(<span class="string">"ERROR"</span>)
+
+<span class="comment"># Create StreamingContext with batch interval of 5 seconds</span>
+ssc = <span class="function">StreamingContext</span>(sc, <span class="number">5</span>)
+
+<span class="comment"># Create DStream from TCP socket</span>
+lines = ssc.<span class="function">socketTextStream</span>(<span class="string">"localhost"</span>, <span class="number">9999</span>)
+
+<span class="comment"># Split lines into words</span>
+words = lines.<span class="function">flatMap</span>(<span class="keyword">lambda</span> line: line.<span class="function">split</span>(<span class="string">" "</span>))
+
+<span class="comment"># Map each word to (word, 1) pair</span>
+pairs = words.<span class="function">map</span>(<span class="keyword">lambda</span> word: (word, <span class="number">1</span>))
+
+<span class="comment"># Count occurrences of each word</span>
+wordCounts = pairs.<span class="function">reduceByKey</span>(<span class="keyword">lambda</span> x, y: x <span class="operator">+</span> y)
+
+<span class="comment"># Print results</span>
+wordCounts.<span class="function">pprint</span>()
+
+<span class="comment"># Start the streaming context</span>
+ssc.<span class="function">start</span>()
+<span class="comment"># Wait for termination</span>
+ssc.<span class="function">awaitTermination</span>()</pre>
+            </div>
+
+            <h3>Windowed Operations Example</h3>
+            <div class="code-header">python - dstreams_window.py</div>
+            <div class="code-block">
+<pre><span class="keyword">from</span> pyspark <span class="keyword">import</span> SparkContext
+<span class="keyword">from</span> pyspark.streaming <span class="keyword">import</span> StreamingContext
+
+sc = <span class="function">SparkContext</span>(<span class="string">"local[2]"</span>, <span class="string">"WindowExample"</span>)
+ssc = <span class="function">StreamingContext</span>(sc, <span class="number">2</span>)  <span class="comment"># 2 second batch interval</span>
+
+<span class="comment"># Enable checkpointing (required for window operations)</span>
+ssc.<span class="function">checkpoint</span>(<span class="string">"./checkpoint"</span>)
+
+lines = ssc.<span class="function">socketTextStream</span>(<span class="string">"localhost"</span>, <span class="number">9999</span>)
+
+<span class="comment"># Window operation: 10 second window, sliding every 4 seconds</span>
+<span class="comment"># This counts words over the last 10 seconds, updated every 4 seconds</span>
+windowedWords = lines.<span class="function">flatMap</span>(<span class="keyword">lambda</span> line: line.<span class="function">split</span>(<span class="string">" "</span>)) \
+    .<span class="function">map</span>(<span class="keyword">lambda</span> word: (word, <span class="number">1</span>)) \
+    .<span class="function">reduceByKeyAndWindow</span>(
+        <span class="keyword">lambda</span> x, y: x <span class="operator">+</span> y,  <span class="comment"># Add new values</span>
+        <span class="keyword">lambda</span> x, y: x <span class="operator">-</span> y,  <span class="comment"># Subtract old values</span>
+        <span class="number">10</span>,  <span class="comment"># Window duration: 10 seconds</span>
+        <span class="number">4</span>   <span class="comment"># Slide duration: 4 seconds</span>
+    )
+
+windowedWords.<span class="function">pprint</span>()
+
+ssc.<span class="function">start</span>()
+ssc.<span class="function">awaitTermination</span>()</pre>
+            </div>
+
+            <h3>Stateful Transformations Example</h3>
+            <div class="code-header">python - dstreams_stateful.py</div>
+            <div class="code-block">
+<pre><span class="keyword">from</span> pyspark <span class="keyword">import</span> SparkContext
+<span class="keyword">from</span> pyspark.streaming <span class="keyword">import</span> StreamingContext
+
+<span class="keyword">def</span> <span class="function">updateFunction</span>(newValues, runningCount):
+    <span class="string">"""
+    Update function for maintaining running count
+    newValues: new values for the key in this batch
+    runningCount: previous running count for the key
+    """</span>
+    <span class="keyword">if</span> runningCount <span class="keyword">is</span> <span class="keyword">None</span>:
+        runningCount = <span class="number">0</span>
+    <span class="keyword">return</span> <span class="function">sum</span>(newValues) <span class="operator">+</span> runningCount
+
+sc = <span class="function">SparkContext</span>(<span class="string">"local[2]"</span>, <span class="string">"StatefulWordCount"</span>)
+ssc = <span class="function">StreamingContext</span>(sc, <span class="number">2</span>)
+
+<span class="comment"># Must enable checkpointing for stateful operations</span>
+ssc.<span class="function">checkpoint</span>(<span class="string">"./checkpoint"</span>)
+
+lines = ssc.<span class="function">socketTextStream</span>(<span class="string">"localhost"</span>, <span class="number">9999</span>)
+
+<span class="comment"># Running word count across all batches</span>
+runningCounts = lines.<span class="function">flatMap</span>(<span class="keyword">lambda</span> line: line.<span class="function">split</span>(<span class="string">" "</span>)) \
+    .<span class="function">map</span>(<span class="keyword">lambda</span> word: (word, <span class="number">1</span>)) \
+    .<span class="function">updateStateByKey</span>(updateFunction)
+
+<span class="comment"># Print the running counts</span>
+runningCounts.<span class="function">pprint</span>()
+
+ssc.<span class="function">start</span>()
+ssc.<span class="function">awaitTermination</span>()</pre>
+            </div>
+        </div>
+
+        <div id="structured" class="section">
+            <h2>⚡ Structured Streaming (Recommended)</h2>
+
+            <p>Structured Streaming is a scalable and fault-tolerant stream processing engine built on the Spark SQL engine. It treats streaming data as a table that is continuously updated.</p>
+
+            <h3>Key Advantages</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>🎯 Exactly-Once Semantics</h4>
+                    <p>Guarantees each record is processed exactly once, even in the presence of failures</p>
+                </div>
+                <div class="card">
+                    <h4>⏰ Event-Time Processing</h4>
+                    <p>Full support for processing data based on event time with automatic handling of late data</p>
+                </div>
+                <div class="card">
+                    <h4>📊 Unified API</h4>
+                    <p>Same DataFrame/Dataset API as batch processing - write once, run in batch or streaming</p>
+                </div>
+                <div class="card">
+                    <h4>🔍 SQL Queries</h4>
+                    <p>Run SQL queries directly on streaming data with full optimization</p>
+                </div>
+            </div>
+
+            <h3>Programming Model</h3>
+            <div class="info-box">
+                <h4>Unbounded Table Abstraction</h4>
+                <p>Structured Streaming treats streaming data as an unbounded input table. New data arriving on the stream is like rows being appended to the table. You can run queries on this table as if it were a static table.</p>
+            </div>
+
+            <h3>Output Modes</h3>
+            <table>
+                <tr>
+                    <th>Mode</th>
+                    <th>Description</th>
+                    <th>Use Case</th>
+                </tr>
+                <tr>
+                    <td><strong>Append</strong></td>
+                    <td>Only new rows are written</td>
+                    <td>Non-aggregated queries, ETL pipelines</td>
+                </tr>
+                <tr>
+                    <td><strong>Complete</strong></td>
+                    <td>Entire result table is written</td>
+                    <td>Small aggregation results</td>
+                </tr>
+                <tr>
+                    <td><strong>Update</strong></td>
+                    <td>Only updated rows are written</td>
+                    <td>Aggregations, stateful operations</td>
+                </tr>
+            </table>
+
+            <h3>Trigger Types</h3>
+            <table>
+                <tr>
+                    <th>Trigger</th>
+                    <th>Description</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td><strong>Unspecified (default)</strong></td>
+                    <td>Process as fast as possible</td>
+                    <td>No trigger specified</td>
+                </tr>
+                <tr>
+                    <td><strong>Fixed Interval</strong></td>
+                    <td>Process at fixed intervals</td>
+                    <td><code>trigger(processingTime='5 seconds')</code></td>
+                </tr>
+                <tr>
+                    <td><strong>One-time</strong></td>
+                    <td>Process once and stop</td>
+                    <td><code>trigger(once=True)</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Continuous</strong></td>
+                    <td>Low-latency continuous processing</td>
+                    <td><code>trigger(continuous='1 second')</code></td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="examples" class="section">
+            <h2>💻 Complete Structured Streaming Examples</h2>
+
+            <h3>Example 1: Basic Socket Stream - Word Count</h3>
+            <div class="code-header">python - structured_wordcount.py</div>
+            <div class="code-block">
+<pre><span class="keyword">from</span> pyspark.sql <span class="keyword">import</span> SparkSession
+<span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> explode, split
+
+<span class="comment"># Create SparkSession</span>
+spark = SparkSession.<span class="function">builder</span> \
+    .<span class="function">appName</span>(<span class="string">"StructuredNetworkWordCount"</span>) \
+    .<span class="function">getOrCreate</span>()
+
+spark.sparkContext.setLogLevel(<span class="string">"ERROR"</span>)
+
+<span class="comment"># Create DataFrame representing the stream of input lines from socket</span>
+lines = spark.<span class="function">readStream</span> \
+    .<span class="function">format</span>(<span class="string">"socket"</span>) \
+    .<span class="function">option</span>(<span class="string">"host"</span>, <span class="string">"localhost"</span>) \
+    .<span class="function">option</span>(<span class="string">"port"</span>, <span class="number">9999</span>) \
+    .<span class="function">load</span>()
+
+<span class="comment"># Split the lines into words</span>
+words = lines.<span class="function">select</span>(
+    <span class="function">explode</span>(<span class="function">split</span>(lines.value, <span class="string">" "</span>)).<span class="function">alias</span>(<span class="string">"word"</span>)
+)
+
+<span class="comment"># Generate running word count</span>
+wordCounts = words.<span class="function">groupBy</span>(<span class="string">"word"</span>).<span class="function">count</span>()
+
+<span class="comment"># Start running the query and print to console</span>
+query = wordCounts.<span class="function">writeStream</span> \
+    .<span class="function">outputMode</span>(<span class="string">"complete"</span>) \
+    .<span class="function">format</span>(<span class="string">"console"</span>) \
+    .<span class="function">trigger</span>(processingTime=<span class="string">'5 seconds'</span>) \
+    .<span class="function">start</span>()
+
+query.<span class="function">awaitTermination</span>()</pre>
+            </div>
+
+            <div class="info-box">
+                <h4>🚀 How to Run This Example</h4>
+                <ol>
+                    <li>Open a terminal and run: <code>nc -lk 9999</code> (netcat to create a socket)</li>
+                    <li>Run the Python script: <code>spark-submit structured_wordcount.py</code></li>
+                    <li>Type words in the netcat terminal to see them counted in real-time</li>
+                </ol>
+            </div>
+
+            <h3>Example 2: Kafka Integration - Real-Time Analytics</h3>
+            <div class="code-header">python - kafka_streaming.py</div>
+            <div class="code-block">
+<pre><span class="keyword">from</span> pyspark.sql <span class="keyword">import</span> SparkSession
+<span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> <span class="operator">*</span>
+<span class="keyword">from</span> pyspark.sql.types <span class="keyword">import</span> <span class="operator">*</span>
+
+<span class="comment"># Create Spark Session</span>
+spark = SparkSession.<span class="function">builder</span> \
+    .<span class="function">appName</span>(<span class="string">"KafkaStructuredStreaming"</span>) \
+    .<span class="function">config</span>(<span class="string">"spark.sql.streaming.schemaInference"</span>, <span class="string">"true"</span>) \
+    .<span class="function">getOrCreate</span>()
+
+<span class="comment"># Define schema for incoming data</span>
+schema = StructType([
+    <span class="function">StructField</span>(<span class="string">"user_id"</span>, StringType(), <span class="keyword">True</span>),
+    <span class="function">StructField</span>(<span class="string">"product_id"</span>, StringType(), <span class="keyword">True</span>),
+    <span class="function">StructField</span>(<span class="string">"action"</span>, StringType(), <span class="keyword">True</span>),
+    <span class="function">StructField</span>(<span class="string">"timestamp"</span>, TimestampType(), <span class="keyword">True</span>),
+    <span class="function">StructField</span>(<span class="string">"price"</span>, DoubleType(), <span class="keyword">True</span>)
+])
+
+<span class="comment"># Read from Kafka</span>
+kafkaStream = spark.<span class="function">readStream</span> \
+    .<span class="function">format</span>(<span class="string">"kafka"</span>) \
+    .<span class="function">option</span>(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"localhost:9092"</span>) \
+    .<span class="function">option</span>(<span class="string">"subscribe"</span>, <span class="string">"user-events"</span>) \
+    .<span class="function">option</span>(<span class="string">"startingOffsets"</span>, <span class="string">"latest"</span>) \
+    .<span class="function">load</span>()
+
+<span class="comment"># Parse the JSON data</span>
+parsedStream = kafkaStream.<span class="function">select</span>(
+    <span class="function">from_json</span>(<span class="function">col</span>(<span class="string">"value"</span>).<span class="function">cast</span>(<span class="string">"string"</span>), schema).<span class="function">alias</span>(<span class="string">"data"</span>)
+).<span class="function">select</span>(<span class="string">"data.*"</span>)
+
+<span class="comment"># Add watermark for handling late data (5 minutes)</span>
+streamWithWatermark = parsedStream.<span class="function">withWatermark</span>(<span class="string">"timestamp"</span>, <span class="string">"5 minutes"</span>)
+
+<span class="comment"># Perform aggregations</span>
+<span class="comment"># 1. Count events by action type in 10-minute windows</span>
+actionCounts = streamWithWatermark \
+    .<span class="function">groupBy</span>(
+        <span class="function">window</span>(<span class="string">"timestamp"</span>, <span class="string">"10 minutes"</span>, <span class="string">"5 minutes"</span>),
+        <span class="string">"action"</span>
+    ) \
+    .<span class="function">count</span>() \
+    .<span class="function">orderBy</span>(<span class="string">"window"</span>)
+
+<span class="comment"># 2. Calculate total revenue per product</span>
+revenueByProduct = streamWithWatermark \
+    .<span class="function">filter</span>(<span class="function">col</span>(<span class="string">"action"</span>) <span class="operator">==</span> <span class="string">"purchase"</span>) \
+    .<span class="function">groupBy</span>(<span class="string">"product_id"</span>) \
+    .<span class="function">agg</span>(
+        <span class="function">sum</span>(<span class="string">"price"</span>).<span class="function">alias</span>(<span class="string">"total_revenue"</span>),
+        <span class="function">count</span>(<span class="string">"*"</span>).<span class="function">alias</span>(<span class="string">"purchase_count"</span>)
+    )
+
+<span class="comment"># Write action counts to console</span>
+query1 = actionCounts.<span class="function">writeStream</span> \
+    .<span class="function">outputMode</span>(<span class="string">"update"</span>) \
+    .<span class="function">format</span>(<span class="string">"console"</span>) \
+    .<span class="function">option</span>(<span class="string">"truncate"</span>, <span class="string">"false"</span>) \
+    .<span class="function">trigger</span>(processingTime=<span class="string">'30 seconds'</span>) \
+    .<span class="function">start</span>()
+
+<span class="comment"># Write revenue data to Parquet files</span>
+query2 = revenueByProduct.<span class="function">writeStream</span> \
+    .<span class="function">outputMode</span>(<span class="string">"complete"</span>) \
+    .<span class="function">format</span>(<span class="string">"parquet"</span>) \
+    .<span class="function">option</span>(<span class="string">"path"</span>, <span class="string">"/tmp/streaming_revenue"</span>) \
+    .<span class="function">option</span>(<span class="string">"checkpointLocation"</span>, <span class="string">"/tmp/checkpoint"</span>) \
+    .<span class="function">trigger</span>(processingTime=<span class="string">'1 minute'</span>) \
+    .<span class="function">start</span>()
+
+<span class="comment"># Wait for termination</span>
+spark.<span class="function">streams</span>.<span class="function">awaitAnyTermination</span>()</pre>
+            </div>
+
+            <h3>Example 3: File Streaming with JSON</h3>
+            <div class="code-header">python - file_streaming.py</div>
+            <div class="code-block">
+<pre><span class="keyword">from</span> pyspark.sql <span class="keyword">import</span> SparkSession
+<span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> <span class="operator">*</span>
+<span class="keyword">from</span> pyspark.sql.types <span class="keyword">import</span> <span class="operator">*</span>
+
+spark = SparkSession.<span class="function">builder</span> \
+    .<span class="function">appName</span>(<span class="string">"FileStreamingExample"</span>) \
+    .<span class="function">getOrCreate</span>()
+
+<span class="comment"># Define schema for log files</span>
+logSchema = StructType([
+    <span class="function">StructField</span>(<span class="string">"timestamp"</span>, TimestampType(), <span class="keyword">True</span>),
+    <span class="function">StructField</span>(<span class="string">"level"</span>, StringType(), <span class="keyword">True</span>),
+    <span class="function">StructField</span>(<span class="string">"service"</span>, StringType(), <span class="keyword">True</span>),
+    <span class="function">StructField</span>(<span class="string">"message"</span>, StringType(), <span class="keyword">True</span>),
+    <span class="function">StructField</span>(<span class="string">"user_id"</span>, StringType(), <span class="keyword">True</span>)
+])
+
+<span class="comment"># Read streaming data from JSON files</span>
+streamingDF = spark.<span class="function">readStream</span> \
+    .<span class="function">schema</span>(logSchema) \
+    .<span class="function">option</span>(<span class="string">"maxFilesPerTrigger"</span>, <span class="number">1</span>) \
+    .<span class="function">json</span>(<span class="string">"/tmp/log_data/"</span>)
+
+<span class="comment"># Filter for ERROR level logs</span>
+errorLogs = streamingDF.<span class="function">filter</span>(<span class="function">col</span>(<span class="string">"level"</span>) <span class="operator">==</span> <span class="string">"ERROR"</span>)
+
+<span class="comment"># Count errors by service and 5-minute window</span>
+errorCounts = errorLogs \
+    .<span class="function">withWatermark</span>(<span class="string">"timestamp"</span>, <span class="string">"10 minutes"</span>) \
+    .<span class="function">groupBy</span>(
+        <span class="function">window</span>(<span class="string">"timestamp"</span>, <span class="string">"5 minutes"</span>),
+        <span class="string">"service"</span>
+    ) \
+    .<span class="function">count</span>() \
+    .<span class="function">orderBy</span>(<span class="string">"window"</span>, <span class="function">desc</span>(<span class="string">"count"</span>))
+
+<span class="comment"># Write to memory for SQL queries</span>
+query = errorCounts.<span class="function">writeStream</span> \
+    .<span class="function">queryName</span>(<span class="string">"error_analysis"</span>) \
+    .<span class="function">outputMode</span>(<span class="string">"complete"</span>) \
+    .<span class="function">format</span>(<span class="string">"memory"</span>) \
+    .<span class="function">trigger</span>(processingTime=<span class="string">'30 seconds'</span>) \
+    .<span class="function">start</span>()
+
+<span class="comment"># Run SQL queries on streaming data</span>
+<span class="keyword">import</span> time
+<span class="keyword">while</span> <span class="keyword">True</span>:
+    time.<span class="function">sleep</span>(<span class="number">30</span>)
+    spark.<span class="function">sql</span>(<span class="string">"""
+        SELECT service, sum(count) as total_errors
+        FROM error_analysis
+        GROUP BY service
+        ORDER BY total_errors DESC
+    """</span>).<span class="function">show</span>()</pre>
+            </div>
+
+            <h3>Example 4: Complete Real-World ETL Pipeline</h3>
+            <div class="code-header">python - complete_etl_pipeline.py</div>
+            <div class="code-block">
+<pre><span class="keyword">from</span> pyspark.sql <span class="keyword">import</span> SparkSession
+<span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> <span class="operator">*</span>
+<span class="keyword">from</span> pyspark.sql.types <span class="keyword">import</span> <span class="operator">*</span>
+<span class="keyword">import</span> json
+
+<span class="comment">"""
+Complete Streaming ETL Pipeline Example
+Simulates a real-world scenario: IoT sensor data processing
+"""</span>
+
+<span class="keyword">class</span> <span class="function">StreamingETLPipeline</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        self.spark = SparkSession.<span class="function">builder</span> \
+            .<span class="function">appName</span>(<span class="string">"IoTStreamingETL"</span>) \
+            .<span class="function">config</span>(<span class="string">"spark.sql.shuffle.partitions"</span>, <span class="number">4</span>) \
+            .<span class="function">getOrCreate</span>()
+        
+        self.spark.sparkContext.setLogLevel(<span class="string">"WARN"</span>)
+    
+    <span class="keyword">def</span> <span class="function">define_schema</span>(self):
+        <span class="string">"""Define schema for IoT sensor data"""</span>
+        <span class="keyword">return</span> StructType([
+            <span class="function">StructField</span>(<span class="string">"device_id"</span>, StringType(), <span class="keyword">False</span>),
+            <span class="function">StructField</span>(<span class="string">"sensor_type"</span>, StringType(), <span class="keyword">False</span>),
+            <span class="function">StructField</span>(<span class="string">"timestamp"</span>, TimestampType(), <span class="keyword">False</span>),
+            <span class="function">StructField</span>(<span class="string">"temperature"</span>, DoubleType(), <span class="keyword">True</span>),
+            <span class="function">StructField</span>(<span class="string">"humidity"</span>, DoubleType(), <span class="keyword">True</span>),
+            <span class="function">StructField</span>(<span class="string">"pressure"</span>, DoubleType(), <span class="keyword">True</span>),
+            <span class="function">StructField</span>(<span class="string">"location"</span>, StringType(), <span class="keyword">True</span>)
+        ])
+    
+    <span class="keyword">def</span> <span class="function">read_stream</span>(self, source_type=<span class="string">"kafka"</span>):
+        <span class="string">"""Read from different sources"""</span>
+        schema = self.<span class="function">define_schema</span>()
+        
+        <span class="keyword">if</span> source_type <span class="operator">==</span> <span class="string">"kafka"</span>:
+            <span class="comment"># Read from Kafka</span>
+            raw_stream = self.spark.<span class="function">readStream</span> \
+                .<span class="function">format</span>(<span class="string">"kafka"</span>) \
+                .<span class="function">option</span>(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"localhost:9092"</span>) \
+                .<span class="function">option</span>(<span class="string">"subscribe"</span>, <span class="string">"iot-sensors"</span>) \
+                .<span class="function">option</span>(<span class="string">"startingOffsets"</span>, <span class="string">"latest"</span>) \
+                .<span class="function">load</span>()
+            
+            <span class="comment"># Parse JSON from Kafka value</span>
+            <span class="keyword">return</span> raw_stream.<span class="function">select</span>(
+                <span class="function">from_json</span>(<span class="function">col</span>(<span class="string">"value"</span>).<span class="function">cast</span>(<span class="string">"string"</span>), schema).<span class="function">alias</span>(<span class="string">"data"</span>)
+            ).<span class="function">select</span>(<span class="string">"data.*"</span>)
+        
+        <span class="keyword">elif</span> source_type <span class="operator">==</span> <span class="string">"file"</span>:
+            <span class="comment"># Read from files</span>
+            <span class="keyword">return</span> self.spark.<span class="function">readStream</span> \
+                .<span class="function">schema</span>(schema) \
+                .<span class="function">option</span>(<span class="string">"maxFilesPerTrigger"</span>, <span class="number">1</span>) \
+                .<span class="function">json</span>(<span class="string">"/tmp/iot_data/"</span>)
+    
+    <span class="keyword">def</span> <span class="function">clean_data</span>(self, df):
+        <span class="string">"""Data cleaning and validation"""</span>
+        <span class="comment"># Remove nulls and invalid values</span>
+        cleaned = df \
+            .<span class="function">filter</span>(<span class="function">col</span>(<span class="string">"device_id"</span>).<span class="function">isNotNull</span>()) \
+            .<span class="function">filter</span>(<span class="function">col</span>(<span class="string">"temperature"</span>).<span class="function">between</span>(<span class="operator">-</span><span class="number">50</span>, <span class="number">100</span>)) \
+            .<span class="function">filter</span>(<span class="function">col</span>(<span class="string">"humidity"</span>).<span class="function">between</span>(<span class="number">0</span>, <span class="number">100</span>)) \
+            .<span class="function">filter</span>(<span class="function">col</span>(<span class="string">"pressure"</span>) <span class="operator">></span> <span class="number">0</span>)
+        
+        <span class="keyword">return</span> cleaned
+    
+    <span class="keyword">def</span> <span class="function">enrich_data</span>(self, df):
+        <span class="string">"""Add derived columns and enrichment"""</span>
+        enriched = df \
+            .<span class="function">withColumn</span>(<span class="string">"temp_fahrenheit"</span>, 
+                        (<span class="function">col</span>(<span class="string">"temperature"</span>) <span class="operator">*</span> <span class="number">9</span>/<span class="number">5</span>) <span class="operator">+</span> <span class="number">32</span>) \
+            .<span class="function">withColumn</span>(<span class="string">"heat_index"</span>,
+                        <span class="function">when</span>(<span class="function">col</span>(<span class="string">"temperature"</span>) <span class="operator">></span> <span class="number">30</span>, <span class="string">"high"</span>)
+                        .<span class="function">when</span>(<span class="function">col</span>(<span class="string">"temperature"</span>) <span class="operator">></span> <span class="number">20</span>, <span class="string">"medium"</span>)
+                        .<span class="function">otherwise</span>(<span class="string">"low"</span>)) \
+            .<span class="function">withColumn</span>(<span class="string">"date"</span>, <span class="function">to_date</span>(<span class="string">"timestamp"</span>)) \
+            .<span class="function">withColumn</span>(<span class="string">"hour"</span>, <span class="function">hour</span>(<span class="string">"timestamp"</span>))
+        
+        <span class="keyword">return</span> enriched
+    
+    <span class="keyword">def</span> <span class="function">detect_anomalies</span>(self, df):
+        <span class="string">"""Detect anomalous readings"""</span>
+        <span class="comment"># Flag readings that are 2 std deviations from recent mean</span>
+        anomalies = df \
+            .<span class="function">withColumn</span>(<span class="string">"is_anomaly"</span>,
+                <span class="function">when</span>(
+                    (<span class="function">col</span>(<span class="string">"temperature"</span>) <span class="operator">></span> <span class="number">40</span>) <span class="operator">|</span> 
+                    (<span class="function">col</span>(<span class="string">"temperature"</span>) <span class="operator"><</span> <span class="number">0</span>) <span class="operator">|</span>
+                    (<span class="function">col</span>(<span class="string">"humidity"</span>) <span class="operator">></span> <span class="number">95</span>),
+                    <span class="keyword">True</span>
+                ).<span class="function">otherwise</span>(<span class="keyword">False</span>)
+            )
+        
+        <span class="keyword">return</span> anomalies
+    
+    <span class="keyword">def</span> <span class="function">aggregate_metrics</span>(self, df):
+        <span class="string">"""Calculate aggregated metrics"""</span>
+        <span class="comment"># Add watermark for late data handling</span>
+        watermarked = df.<span class="function">withWatermark</span>(<span class="string">"timestamp"</span>, <span class="string">"10 minutes"</span>)
+        
+        <span class="comment"># Calculate metrics per device in 5-minute windows</span>
+        metrics = watermarked \
+            .<span class="function">groupBy</span>(
+                <span class="function">window</span>(<span class="string">"timestamp"</span>, <span class="string">"5 minutes"</span>, <span class="string">"1 minute"</span>),
+                <span class="string">"device_id"</span>,
+                <span class="string">"location"</span>
+            ) \
+            .<span class="function">agg</span>(
+                <span class="function">avg</span>(<span class="string">"temperature"</span>).<span class="function">alias</span>(<span class="string">"avg_temperature"</span>),
+                <span class="function">max</span>(<span class="string">"temperature"</span>).<span class="function">alias</span>(<span class="string">"max_temperature"</span>),
+                <span class="function">min</span>(<span class="string">"temperature"</span>).<span class="function">alias</span>(<span class="string">"min_temperature"</span>),
+                <span class="function">avg</span>(<span class="string">"humidity"</span>).<span class="function">alias</span>(<span class="string">"avg_humidity"</span>),
+                <span class="function">count</span>(<span class="string">"*"</span>).<span class="function">alias</span>(<span class="string">"reading_count"</span>),
+                <span class="function">sum</span>(<span class="function">when</span>(<span class="function">col</span>(<span class="string">"is_anomaly"</span>), <span class="number">1</span>).<span class="function">otherwise</span>(<span class="number">0</span>)).<span class="function">alias</span>(<span class="string">"anomaly_count"</span>)
+            )
+        
+        <span class="keyword">return</span> metrics
+    
+    <span class="keyword">def</span> <span class="function">write_to_multiple_sinks</span>(self, raw_df, metrics_df):
+        <span class="string">"""Write to multiple destinations"""</span>
+        
+        <span class="comment"># 1. Write raw data to Parquet (data lake)</span>
+        raw_query = raw_df \
+            .<span class="function">writeStream</span> \
+            .<span class="function">format</span>(<span class="string">"parquet"</span>) \
+            .<span class="function">outputMode</span>(<span class="string">"append"</span>) \
+            .<span class="function">option</span>(<span class="string">"path"</span>, <span class="string">"/tmp/iot_lake/raw_data"</span>) \
+            .<span class="function">option</span>(<span class="string">"checkpointLocation"</span>, <span class="string">"/tmp/checkpoint/raw"</span>) \
+            .<span class="function">partitionBy</span>(<span class="string">"date"</span>, <span class="string">"hour"</span>) \
+            .<span class="function">trigger</span>(processingTime=<span class="string">'1 minute'</span>) \
+            .<span class="function">start</span>()
+        
+        <span class="comment"># 2. Write metrics to console for monitoring</span>
+        console_query = metrics_df \
+            .<span class="function">writeStream</span> \
+            .<span class="function">format</span>(<span class="string">"console"</span>) \
+            .<span class="function">outputMode</span>(<span class="string">"update"</span>) \
+            .<span class="function">option</span>(<span class="string">"truncate"</span>, <span class="string">"false"</span>) \
+            .<span class="function">trigger</span>(processingTime=<span class="string">'30 seconds'</span>) \
+            .<span class="function">start</span>()
+        
+        <span class="comment"># 3. Write aggregated metrics to Delta table</span>
+        delta_query = metrics_df \
+            .<span class="function">writeStream</span> \
+            .<span class="function">format</span>(<span class="string">"delta"</span>) \
+            .<span class="function">outputMode</span>(<span class="string">"update"</span>) \
+            .<span class="function">option</span>(<span class="string">"path"</span>, <span class="string">"/tmp/iot_lake/metrics"</span>) \
+            .<span class="function">option</span>(<span class="string">"checkpointLocation"</span>, <span class="string">"/tmp/checkpoint/metrics"</span>) \
+            .<span class="function">trigger</span>(processingTime=<span class="string">'1 minute'</span>) \
+            .<span class="function">start</span>()
+        
+        <span class="comment"># 4. Write anomalies to a separate stream for alerting</span>
+        anomalies = raw_df.<span class="function">filter</span>(<span class="function">col</span>(<span class="string">"is_anomaly"</span>) <span class="operator">==</span> <span class="keyword">True</span>)
+        anomaly_query = anomalies \
+            .<span class="function">writeStream</span> \
+            .<span class="function">format</span>(<span class="string">"json"</span>) \
+            .<span class="function">outputMode</span>(<span class="string">"append"</span>) \
+            .<span class="function">option</span>(<span class="string">"path"</span>, <span class="string">"/tmp/iot_lake/anomalies"</span>) \
+            .<span class="function">option</span>(<span class="string">"checkpointLocation"</span>, <span class="string">"/tmp/checkpoint/anomalies"</span>) \
+            .<span class="function">trigger</span>(processingTime=<span class="string">'10 seconds'</span>) \
+            .<span class="function">start</span>()
+        
+        <span class="keyword">return</span> [raw_query, console_query, delta_query, anomaly_query]
+    
+    <span class="keyword">def</span> <span class="function">run_pipeline</span>(self):
+        <span class="string">"""Execute the complete ETL pipeline"""</span>
+        <span class="function">print</span>(<span class="string">"Starting Streaming ETL Pipeline..."</span>)
+        
+        <span class="comment"># 1. Read stream</span>
+        raw_stream = self.<span class="function">read_stream</span>(source_type=<span class="string">"kafka"</span>)
+        
+        <span class="comment"># 2. Clean data</span>
+        cleaned = self.<span class="function">clean_data</span>(raw_stream)
+        
+        <span class="comment"># 3. Enrich data</span>
+        enriched = self.<span class="function">enrich_data</span>(cleaned)
+        
+        <span class="comment"># 4. Detect anomalies</span>
+        with_anomalies = self.<span class="function">detect_anomalies</span>(enriched)
+        
+        <span class="comment"># 5. Calculate metrics</span>
+        metrics = self.<span class="function">aggregate_metrics</span>(with_anomalies)
+        
+        <span class="comment"># 6. Write to sinks</span>
+        queries = self.<span class="function">write_to_multiple_sinks</span>(with_anomalies, metrics)
+        
+        <span class="comment"># Wait for all queries</span>
+        <span class="function">print</span>(<span class="string">"Pipeline running. Press Ctrl+C to stop."</span>)
+        self.spark.<span class="function">streams</span>.<span class="function">awaitAnyTermination</span>()
+
+<span class="comment"># Run the pipeline</span>
+<span class="keyword">if</span> __name__ <span class="operator">==</span> <span class="string">"__main__"</span>:
+    pipeline = <span class="function">StreamingETLPipeline</span>()
+    pipeline.<span class="function">run_pipeline</span>()</pre>
+            </div>
+        </div>
+
+        <div id="sources" class="section">
+            <h2>📥 Data Sources & Sinks</h2>
+
+            <h3>Supported Data Sources</h3>
+            <table>
+                <tr>
+                    <th>Source</th>
+                    <th>Format</th>
+                    <th>Use Case</th>
+                    <th>Code Example</th>
+                </tr>
+                <tr>
+                    <td><strong>Apache Kafka</strong></td>
+                    <td>kafka</td>
+                    <td>Message queues, event streams</td>
+                    <td><code>.format("kafka")</code></td>
+                </tr>
+                <tr>
+                    <td><strong>File System</strong></td>
+                    <td>json, csv, parquet, orc</td>
+                    <td>Log files, data dumps</td>
+                    <td><code>.json("/path")</code></td>
+                </tr>
+                <tr>
+                    <td><strong>TCP Socket</strong></td>
+                    <td>socket</td>
+                    <td>Testing, debugging</td>
+                    <td><code>.format("socket")</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Amazon Kinesis</strong></td>
+                    <td>kinesis</td>
+                    <td>AWS streaming data</td>
+                    <td><code>.format("kinesis")</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Rate Source</strong></td>
+                    <td>rate</td>
+                    <td>Testing, benchmarking</td>
+                    <td><code>.format("rate")</code></td>
+                </tr>
+            </table>
+
+            <h3>Supported Sinks</h3>
+            <table>
+                <tr>
+                    <th>Sink</th>
+                    <th>Format</th>
+                    <th>Use Case</th>
+                    <th>Output Mode</th>
+                </tr>
+                <tr>
+                    <td><strong>File Sink</strong></td>
+                    <td>parquet, orc, json, csv</td>
+                    <td>Data lakes, archives</td>
+                    <td>Append</td>
+                </tr>
+                <tr>
+                    <td><strong>Kafka</strong></td>
+                    <td>kafka</td>
+                    <td>Event streaming</td>
+                    <td>Append, Update</td>
+                </tr>
+                <tr>
+                    <td><strong>Console</strong></td>
+                    <td>console</td>
+                    <td>Debugging, monitoring</td>
+                    <td>All modes</td>
+                </tr>
+                <tr>
+                    <td><strong>Memory</strong></td>
+                    <td>memory</td>
+                    <td>Testing, SQL queries</td>
+                    <td>Complete, Update</td>
+                </tr>
+                <tr>
+                    <td><strong>Delta Lake</strong></td>
+                    <td>delta</td>
+                    <td>ACID transactions</td>
+                    <td>All modes</td>
+                </tr>
+                <tr>
+                    <td><strong>ForeachBatch</strong></td>
+                    <td>foreachBatch</td>
+                    <td>Custom logic, databases</td>
+                    <td>All modes</td>
+                </tr>
+            </table>
+
+            <h3>Kafka Source Example</h3>
+            <div class="code-header">python</div>
+            <div class="code-block">
+<pre>df = spark.<span class="function">readStream</span> \
+    .<span class="function">format</span>(<span class="string">"kafka"</span>) \
+    .<span class="function">option</span>(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"host1:port1,host2:port2"</span>) \
+    .<span class="function">option</span>(<span class="string">"subscribe"</span>, <span class="string">"topic1,topic2"</span>) \
+    .<span class="function">option</span>(<span class="string">"startingOffsets"</span>, <span class="string">"earliest"</span>) \  <span class="comment"># or "latest"</span>
+    .<span class="function">load</span>()</pre>
+            </div>
+
+            <h3>File Source Example</h3>
+            <div class="code-header">python</div>
+            <div class="code-block">
+<pre><span class="comment"># JSON files</span>
+df = spark.<span class="function">readStream</span> \
+    .<span class="function">schema</span>(schema) \
+    .<span class="function">option</span>(<span class="string">"maxFilesPerTrigger"</span>, <span class="number">1</span>) \
+    .<span class="function">json</span>(<span class="string">"/path/to/directory"</span>)
+
+<span class="comment"># CSV files</span>
+df = spark.<span class="function">readStream</span> \
+    .<span class="function">schema</span>(schema) \
+    .<span class="function">option</span>(<span class="string">"header"</span>, <span class="string">"true"</span>) \
+    .<span class="function">csv</span>(<span class="string">"/path/to/directory"</span>)</pre>
+            </div>
+
+            <h3>ForeachBatch Sink Example (Custom Writing)</h3>
+            <div class="code-header">python</div>
+            <div class="code-block">
+<pre><span class="keyword">def</span> <span class="function">write_to_database</span>(batch_df, batch_id):
+    <span class="string">"""Custom function to write each batch"""</span>
+    <span class="comment"># Write to PostgreSQL</span>
+    batch_df.<span class="function">write</span> \
+        .<span class="function">format</span>(<span class="string">"jdbc"</span>) \
+        .<span class="function">option</span>(<span class="string">"url"</span>, <span class="string">"jdbc:postgresql://localhost/mydb"</span>) \
+        .<span class="function">option</span>(<span class="string">"dbtable"</span>, <span class="string">"streaming_data"</span>) \
+        .<span class="function">option</span>(<span class="string">"user"</span>, <span class="string">"username"</span>) \
+        .<span class="function">option</span>(<span class="string">"password"</span>, <span class="string">"password"</span>) \
+        .<span class="function">mode</span>(<span class="string">"append"</span>) \
+        .<span class="function">save</span>()
+    
+    <span class="function">print</span>(<span class="string">f"Batch {batch_id} written to database"</span>)
+
+<span class="comment"># Use foreachBatch</span>
+query = df.<span class="function">writeStream</span> \
+    .<span class="function">foreachBatch</span>(write_to_database) \
+    .<span class="function">start</span>()</pre>
+            </div>
+        </div>
+
+        <div id="operations" class="section">
+            <h2>🔧 Stream Operations</h2>
+
+            <h3>Windowing Operations</h3>
+            <p>Windowing allows you to group data that arrives within a certain time window. PySpark supports both tumbling and sliding windows.</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h4>Tumbling Window</h4>
+                    <p>Non-overlapping, fixed-size windows</p>
+                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; margin-top: 10px;"><code>window("timestamp", "10 minutes")</code></pre>
+                </div>
+                <div class="card">
+                    <h4>Sliding Window</h4>
+                    <p>Overlapping windows that slide</p>
+                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; margin-top: 10px;"><code>window("timestamp", 
+       "10 minutes", 
+       "5 minutes")</code></pre>
+                </div>
+            </div>
+
+            <h3>Window Example</h3>
+            <div class="code-header">python</div>
+            <div class="code-block">
+<pre><span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> window
+
+<span class="comment"># Count events in 10-minute tumbling windows</span>
+windowed = df \
+    .<span class="function">groupBy</span>(
+        <span class="function">window</span>(<span class="string">"timestamp"</span>, <span class="string">"10 minutes"</span>),
+        <span class="string">"user_id"</span>
+    ) \
+    .<span class="function">count</span>()
+
+<span class="comment"># Sliding window: 10-minute window, slides every 5 minutes</span>
+sliding = df \
+    .<span class="function">groupBy</span>(
+        <span class="function">window</span>(<span class="string">"timestamp"</span>, <span class="string">"10 minutes"</span>, <span class="string">"5 minutes"</span>),
+        <span class="string">"product_id"</span>
+    ) \
+    .<span class="function">agg</span>(<span class="function">sum</span>(<span class="string">"amount"</span>))</pre>
+            </div>
+
+            <h3>Watermarking</h3>
+            <p>Watermarks allow the system to track progress in event time and clean up old state. Essential for handling late data.</p>
+
+            <div class="code-header">python</div>
+            <div class="code-block">
+<pre><span class="comment"># Define watermark: allow data up to 10 minutes late</span>
+withWatermark = df \
+    .<span class="function">withWatermark</span>(<span class="string">"timestamp"</span>, <span class="string">"10 minutes"</span>) \
+    .<span class="function">groupBy</span>(
+        <span class="function">window</span>(<span class="string">"timestamp"</span>, <span class="string">"5 minutes"</span>),
+        <span class="string">"device_id"</span>
+    ) \
+    .<span class="function">count</span>()</pre>
+            </div>
+
+            <div class="info-box">
+                <h4>How Watermarks Work</h4>
+                <p>If you specify a watermark of "10 minutes", Spark will:</p>
+                <ul>
+                    <li>Track the maximum event timestamp seen</li>
+                    <li>Calculate watermark as: max_event_time - 10 minutes</li>
+                    <li>Drop events older than the watermark</li>
+                    <li>Clean up state for windows older than the watermark</li>
+                </ul>
+            </div>
+
+            <h3>Join Operations</h3>
+
+            <h4>Stream-Stream Joins</h4>
+            <div class="code-header">python</div>
+            <div class="code-block">
+<pre><span class="comment"># Join two streams with watermarks</span>
+impressions = spark.<span class="function">readStream</span>.<span class="function">...</span>  <span class="comment"># stream 1</span>
+clicks = spark.<span class="function">readStream</span>.<span class="function">...</span>       <span class="comment"># stream 2</span>
+
+<span class="comment"># Add watermarks to both streams</span>
+impressions_wm = impressions.<span class="function">withWatermark</span>(<span class="string">"impressionTime"</span>, <span class="string">"10 minutes"</span>)
+clicks_wm = clicks.<span class="function">withWatermark</span>(<span class="string">"clickTime"</span>, <span class="string">"20 minutes"</span>)
+
+<span class="comment"># Join with time constraints</span>
+joined = impressions_wm.<span class="function">join</span>(
+    clicks_wm,
+    <span class="function">expr</span>(<span class="string">"""
+        impressionId = clickId AND
+        clickTime >= impressionTime AND
+        clickTime <= impressionTime + interval 1 hour
+    """</span>)
+)</pre>
+            </div>
+
+            <h4>Stream-Static Join</h4>
+            <div class="code-header">python</div>
+            <div class="code-block">
+<pre><span class="comment"># Load static data</span>
+staticData = spark.<span class="function">read</span>.<span class="function">parquet</span>(<span class="string">"/path/to/static"</span>)
+
+<span class="comment"># Join streaming with static</span>
+enriched = streamingDF.<span class="function">join</span>(
+    staticData,
+    streamingDF.product_id <span class="operator">==</span> staticData.id,
+    <span class="string">"left"</span>
+)</pre>
+            </div>
+
+            <h3>Deduplication</h3>
+            <div class="code-header">python</div>
+            <div class="code-block">
+<pre><span class="comment"># Deduplicate based on columns with watermark</span>
+deduplicated = df \
+    .<span class="function">withWatermark</span>(<span class="string">"timestamp"</span>, <span class="string">"10 minutes"</span>) \
+    .<span class="function">dropDuplicates</span>([<span class="string">"user_id"</span>, <span class="string">"event_id"</span>])</pre>
+            </div>
+        </div>
+
+        <div id="best-practices" class="section">
+            <h2>✨ Best Practices</h2>
+
+            <h3>1. Performance Optimization</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>Partitioning</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>Set appropriate shuffle partitions</li>
+                        <li>Use <code>repartition()</code> wisely</li>
+                        <li>Partition output data logically</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Batch Intervals</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>Balance latency vs throughput</li>
+                        <li>Ensure batch completes before next</li>
+                        <li>Monitor processing times</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="code-header">python - Performance Configuration</div>
+            <div class="code-block">
+<pre>spark.<span class="function">conf</span>.<span class="function">set</span>(<span class="string">"spark.sql.shuffle.partitions"</span>, <span class="number">200</span>)
+spark.<span class="function">conf</span>.<span class="function">set</span>(<span class="string">"spark.streaming.backpressure.enabled"</span>, <span class="string">"true"</span>)
+spark.<span class="function">conf</span>.<span class="function">set</span>(<span class="string">"spark.streaming.kafka.maxRatePerPartition"</span>, <span class="number">1000</span>)</pre>
+            </div>
+
+            <h3>2. Fault Tolerance</h3>
+            <div class="success-box">
+                <h4>Checkpointing Best Practices</h4>
+                <ul>
+                    <li><strong>Always enable checkpointing</strong> for production applications</li>
+                    <li>Use reliable storage (HDFS, S3) for checkpoint location</li>
+                    <li>Don't change application logic between restarts with same checkpoint</li>
+                    <li>Clean up old checkpoint data periodically</li>
+                </ul>
+            </div>
+
+            <div class="code-header">python</div>
+            <div class="code-block">
+<pre>query = df.<span class="function">writeStream</span> \
+    .<span class="function">option</span>(<span class="string">"checkpointLocation"</span>, <span class="string">"s3a://bucket/checkpoints/app1"</span>) \
+    .<span class="function">start</span>()</pre>
+            </div>
+
+            <h3>3. State Management</h3>
+            <div class="warning-box">
+                <h4>State Size Considerations</h4>
+                <ul>
+                    <li>Use watermarks to limit state size</li>
+                    <li>Set appropriate watermark delays</li>
+                    <li>Monitor state store sizes</li>
+                    <li>Use <code>mapGroupsWithState</code> for custom state management</li>
+                </ul>
+            </div>
+
+            <h3>4. Monitoring & Debugging</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>What to Monitor</th>
+                    <th>Action</th>
+                </tr>
+                <tr>
+                    <td><strong>Processing Time</strong></td>
+                    <td>Time to process each batch</td>
+                    <td>Should be less than batch interval</td>
+                </tr>
+                <tr>
+                    <td><strong>Scheduling Delay</strong></td>
+                    <td>Time waiting to start processing</td>
+                    <td>Indicates backlog if increasing</td>
+                </tr>
+                <tr>
+                    <td><strong>Input Rate</strong></td>
+                    <td>Records received per second</td>
+                    <td>Monitor for spikes</td>
+                </tr>
+                <tr>
+                    <td><strong>State Store</strong></td>
+                    <td>Size of maintained state</td>
+                    <td>Should stabilize with watermarks</td>
+                </tr>
+            </table>
+
+            <h3>5. Code Quality</h3>
+            <div class="code-header">python - Good Practices</div>
+            <div class="code-block">
+<pre><span class="comment"># ✅ Good: Reusable transformation functions</span>
+<span class="keyword">def</span> <span class="function">clean_data</span>(df):
+    <span class="keyword">return</span> df.<span class="function">filter</span>(<span class="function">col</span>(<span class="string">"value"</span>).<span class="function">isNotNull</span>())
+
+<span class="keyword">def</span> <span class="function">enrich_data</span>(df):
+    <span class="keyword">return</span> df.<span class="function">withColumn</span>(<span class="string">"processed_at"</span>, <span class="function">current_timestamp</span>())
+
+<span class="comment"># Apply transformations</span>
+result = raw_stream \
+    .<span class="function">transform</span>(clean_data) \
+    .<span class="function">transform</span>(enrich_data)
+
+<span class="comment"># ✅ Good: Error handling</span>
+<span class="keyword">try</span>:
+    query.<span class="function">awaitTermination</span>()
+<span class="keyword">except</span> Exception <span class="keyword">as</span> e:
+    <span class="function">print</span>(<span class="string">f"Stream failed: {e}"</span>)
+    <span class="comment"># Implement retry logic or alerting</span>
+
+<span class="comment"># ✅ Good: Graceful shutdown</span>
+<span class="keyword">import</span> signal
+<span class="keyword">def</span> <span class="function">shutdown_handler</span>(sig, frame):
+    <span class="function">print</span>(<span class="string">"Shutting down gracefully..."</span>)
+    query.<span class="function">stop</span>()
+    spark.<span class="function">stop</span>()
+    
+signal.<span class="function">signal</span>(signal.SIGINT, shutdown_handler)</pre>
+            </div>
+
+            <h3>6. Testing Strategies</h3>
+            <div class="highlight-box">
+                <h4>Testing Approaches</h4>
+                <ul>
+                    <li><strong>Unit Tests:</strong> Test transformation logic on static DataFrames</li>
+                    <li><strong>Integration Tests:</strong> Use memory sinks for end-to-end testing</li>
+                    <li><strong>Load Tests:</strong> Use rate source to simulate load</li>
+                    <li><strong>One-time Trigger:</strong> Process all data once for validation</li>
+                </ul>
+            </div>
+
+            <h3>7. Common Pitfalls to Avoid</h3>
+            <div class="warning-box">
+                <h4>⚠️ Avoid These Mistakes</h4>
+                <ul>
+                    <li>❌ Not enabling checkpointing in production</li>
+                    <li>❌ Forgetting watermarks with stateful operations</li>
+                    <li>❌ Using complete mode with large result sets</li>
+                    <li>❌ Not monitoring state store growth</li>
+                    <li>❌ Inadequate error handling and logging</li>
+                    <li>❌ Not testing with production-like data volumes</li>
+                    <li>❌ Ignoring backpressure warnings</li>
+                </ul>
+            </div>
+
+            <h3>Summary Checklist</h3>
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Checklist Items</th>
+                </tr>
+                <tr>
+                    <td><strong>Setup</strong></td>
+                    <td>
+                        ☑️ Enable checkpointing<br>
+                        ☑️ Configure appropriate batch intervals<br>
+                        ☑️ Set shuffle partitions
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Data Quality</strong></td>
+                    <td>
+                        ☑️ Validate input schema<br>
+                        ☑️ Handle null values<br>
+                        ☑️ Implement data quality checks
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>State Management</strong></td>
+                    <td>
+                        ☑️ Use watermarks for stateful ops<br>
+                        ☑️ Monitor state size<br>
+                        ☑️ Handle late data appropriately
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Operations</strong></td>
+                    <td>
+                        ☑️ Implement monitoring<br>
+                        ☑️ Set up alerting<br>
+                        ☑️ Plan for failures<br>
+                        ☑️ Document configuration
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section" style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white;">
+            <h2 style="color: white; border-color: white;">🎓 Conclusion</h2>
+            <p style="color: rgba(255,255,255,0.95); font-size: 1.2rem;">PySpark Streaming provides a powerful, scalable framework for real-time data processing. Whether you're building ETL pipelines, real-time analytics dashboards, or complex event processing systems, PySpark Streaming offers the tools and flexibility you need.</p>
+            
+            <h3 style="color: white; margin-top: 30px;">Key Takeaways</h3>
+            <ul style="color: rgba(255,255,255,0.9); font-size: 1.05rem;">
+                <li>Use <strong>Structured Streaming</strong> for all new projects - it's more powerful and easier to use</li>
+                <li>Always enable <strong>checkpointing</strong> and use <strong>watermarks</strong> for production applications</li>
+                <li>Monitor your streams closely - watch processing times, state sizes, and input rates</li>
+                <li>Start simple and optimize based on actual workload characteristics</li>
+                <li>Test thoroughly with production-like data volumes before deployment</li>
+            </ul>
+
+            <div style="margin-top: 40px; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 12px; backdrop-filter: blur(10px);">
+                <h3 style="color: white; margin-top: 0;">📚 Further Resources</h3>
+                <ul style="color: rgba(255,255,255,0.9);">
+                    <li>Apache Spark Documentation: spark.apache.org</li>
+                    <li>Structured Streaming Programming Guide</li>
+                    <li>PySpark API Documentation</li>
+                    <li>Databricks Learning Academy</li>
+                    <li>Spark Summit Talks and Papers</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: var(--primary); color: white; text-align: center; padding: 40px 20px;">
+        <p style="font-size: 1.1rem; margin: 0; opacity: 0.9;">Created with ⚡ for learning PySpark Streaming</p>
+        <p style="margin-top: 10px; opacity: 0.7;">© 2024 - Comprehensive Streaming Guide</p>
+    </div>
+</body>
+</html>
