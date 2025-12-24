@@ -1,0 +1,8 @@
+[
+  {"order_id": 101, "customer": "Rahul", "city": "Pune", "amount": 500, "order_date": "2024-01-10"},
+  {"order_id": 102, "customer": "Rahul", "city": "Pune", "amount": 700, "order_date": "2024-01-15"},
+  {"order_id": 103, "customer": "Anita", "city": "Mumbai", "amount": 400, "order_date": "2024-01-11"},
+  {"order_id": 104, "customer": "Anita", "city": "Mumbai", "amount": 900, "order_date": "2024-01-20"},
+  {"order_id": 105, "customer": "Vikas", "city": "Delhi", "amount": 300, "order_date": "2024-01-12"},
+  {"order_id": 106, "customer": "Rahul", "city": "Pune", "amount": 1000, "order_date": "2024-01-25"}
+]
