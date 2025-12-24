@@ -1,0 +1,7 @@
+[
+  {"txn_id": 1, "user": "A", "amount": 100, "txn_time": "2024-01-01 10:00:00"},
+  {"txn_id": 2, "user": "A", "amount": 200, "txn_time": "2024-01-01 10:05:00"},
+  {"txn_id": 3, "user": "A", "amount": 300, "txn_time": "2024-01-01 10:10:00"},
+  {"txn_id": 4, "user": "A", "amount": 400, "txn_time": "2024-01-01 10:15:00"},
+  {"txn_id": 5, "user": "A", "amount": 500, "txn_time": "2024-01-01 10:20:00"}
+]
