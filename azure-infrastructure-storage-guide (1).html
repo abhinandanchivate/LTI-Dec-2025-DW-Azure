@@ -1,0 +1,3138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Infrastructure & Storage - Complete Guide (Dec 2025)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #0078d4;
+            --secondary: #00a4ef;
+            --accent: #ff6b35;
+            --dark: #1a1a2e;
+            --darker: #0f0f1e;
+            --light: #f5f7fa;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --code-bg: #2d3748;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="2" height="2" fill="%23ffffff" opacity="0.1"/></svg>');
+            background-size: 20px 20px;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-family: 'Space Mono', monospace;
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .update-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-tab {
+            padding: 0.8rem 1.5rem;
+            background: var(--light);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-tab:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-family: 'Space Mono', monospace;
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .card h3 {
+            color: var(--dark);
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            position: relative;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, var(--light) 0%, white 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 120, 212, 0.15);
+        }
+
+        .info-card h4 {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .info-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0.2rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .badge-what { background: #dbeafe; color: #1e40af; }
+        .badge-why { background: #d1fae5; color: #065f46; }
+        .badge-when { background: #fef3c7; color: #92400e; }
+        .badge-how { background: #e0e7ff; color: #3730a3; }
+        .badge-cost { background: #fee2e2; color: #991b1b; }
+
+        .step-list {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .step-list li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .step-list li:last-child {
+            border-bottom: none;
+        }
+
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--primary);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .do-dont-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .do-section, .dont-section {
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .do-section {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 4px solid var(--success);
+        }
+
+        .dont-section {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-left: 4px solid var(--danger);
+        }
+
+        .do-section h4 {
+            color: #065f46;
+            margin-bottom: 1rem;
+        }
+
+        .dont-section h4 {
+            color: #991b1b;
+            margin-bottom: 1rem;
+        }
+
+        .do-section ul, .dont-section ul {
+            list-style: none;
+        }
+
+        .do-section li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .dont-section li::before {
+            content: '✗';
+            color: var(--danger);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:hover {
+            background: var(--light);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: var(--primary);
+            color: #1e40af;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: var(--warning);
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .do-dont-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer {
+            background: var(--darker);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>⚡ Azure Infrastructure & Storage</h1>
+            <p class="subtitle">Complete Technical Guide with Architecture Flows & Best Practices</p>
+            <span class="update-badge">Updated: December 2025</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showSection('infrastructure')">Infrastructure</div>
+            <div class="nav-tab" onclick="showSection('storage')">Storage Accounts</div>
+            <div class="nav-tab" onclick="showSection('redundancy')">Redundancy</div>
+            <div class="nav-tab" onclick="showSection('blobs')">Blob Storage</div>
+            <div class="nav-tab" onclick="showSection('adls')">ADLS Gen2</div>
+            <div class="nav-tab" onclick="showSection('security')">Security</div>
+            <div class="nav-tab" onclick="showSection('practices')">Best Practices</div>
+        </div>
+
+        <!-- INFRASTRUCTURE SECTION -->
+        <div id="infrastructure" class="content-section active">
+            <div class="card">
+                <h2>🌍 Azure Global Infrastructure</h2>
+                
+                <div class="alert alert-info">
+                    <strong>What:</strong> Azure's physical and logical infrastructure spanning 60+ regions worldwide, providing compute, storage, and network services with high availability and disaster recovery.
+                </div>
+
+                <h3>Architecture Overview</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+                        graph TB
+                            A[Azure Global Infrastructure] --> B[Geographies]
+                            
+                            B --> F[North America]
+                            B --> G[Europe]
+                            B --> H[Asia Pacific]
+                            B --> I[Middle East]
+                            
+                            F --> C1[Regions]
+                            G --> C2[Regions]
+                            H --> C3[Regions]
+                            I --> C4[Regions]
+                            
+                            C1 --> J1[Region Pairs]
+                            J1 --> K1[Primary Region:<br/>East US]
+                            J1 --> L1[Secondary Region:<br/>West US]
+                            
+                            K1 --> D1[Availability Zones]
+                            D1 --> M1[Zone 1]
+                            D1 --> M2[Zone 2]
+                            D1 --> M3[Zone 3]
+                            
+                            M1 --> DC1[Data Center]
+                            DC1 --> P1[Building 1]
+                            DC1 --> P2[Building 2]
+                            DC1 --> P3[Building N]
+                            
+                            DC1 --> INF[Infrastructure]
+                            INF --> Q[Independent Power]
+                            INF --> R[Independent Cooling]
+                            INF --> S[Independent Network]
+                            
+                            style A fill:#0078d4,color:#fff
+                            style B fill:#00a4ef,color:#fff
+                            style C1 fill:#50e6ff,color:#000
+                            style C2 fill:#50e6ff,color:#000
+                            style C3 fill:#50e6ff,color:#000
+                            style C4 fill:#50e6ff,color:#000
+                            style D1 fill:#ffb900,color:#000
+                            style DC1 fill:#ff6b35,color:#fff
+                            style INF fill:#10b981,color:#fff
+                    </div>
+                </div>
+
+                <h3>📍 Regions & Availability Zones</h3>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Region</h4>
+                        <p>A geographical area containing one or more datacenters networked together with a low-latency network. Each region is at least 300 miles away from another region.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Availability Zone (AZ)</h4>
+                        <p>Physically separate locations within an Azure region. Each zone has independent power, cooling, and networking. Minimum of 3 zones in enabled regions.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Region Pairs</h4>
+                        <p>Each region is paired with another region within the same geography, at least 300 miles away, for disaster recovery and planned maintenance.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Geography</h4>
+                        <p>A discrete market preserving data residency and compliance boundaries (e.g., US, Europe, Asia Pacific, Africa).</p>
+                    </div>
+                </div>
+
+                <h3>Why Use Regions & Zones?</h3>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li><strong>High Availability:</strong> 99.99% uptime SLA with zone-redundant services</li>
+                    <li><strong>Disaster Recovery:</strong> Region pairs for geo-redundant backup</li>
+                    <li><strong>Data Residency:</strong> Comply with local regulations (GDPR, data sovereignty)</li>
+                    <li><strong>Low Latency:</strong> Deploy closer to end users</li>
+                    <li><strong>Performance:</strong> Distribute workloads across zones</li>
+                </ul>
+
+                <h3>When to Choose Which Region?</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Scenario</th>
+                                <th>Recommended Approach</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>User Proximity</td>
+                                <td>Deploy in region closest to users</td>
+                                <td>US East for North American customers</td>
+                            </tr>
+                            <tr>
+                                <td>Data Residency</td>
+                                <td>Use region within required geography</td>
+                                <td>Germany for GDPR compliance</td>
+                            </tr>
+                            <tr>
+                                <td>Service Availability</td>
+                                <td>Check regional service availability</td>
+                                <td>Some AI services limited to specific regions</td>
+                            </tr>
+                            <tr>
+                                <td>Cost Optimization</td>
+                                <td>Compare regional pricing</td>
+                                <td>Some regions have lower compute costs</td>
+                            </tr>
+                            <tr>
+                                <td>Disaster Recovery</td>
+                                <td>Use paired regions</td>
+                                <td>East US ↔ West US</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>💰 Pay-As-You-Go (PAYG) Model</h3>
+                
+                <div class="alert alert-info">
+                    <strong>What:</strong> Consumption-based pricing where you pay only for the resources you use, measured per second or hour, with no upfront costs or termination fees.
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>How It Works</h4>
+                        <p>Resources are metered by usage time, data transfer, storage capacity, and transactions. Billing is calculated monthly based on actual consumption.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Benefits</h4>
+                        <p>No capital expenditure, scale up/down as needed, pay only for what you use, no long-term commitments required.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Cost Optimization</h4>
+                        <p>Use Azure Cost Management, set budgets and alerts, rightsize resources, stop unused resources, use reserved instances for predictable workloads.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Alternatives</h4>
+                        <p>Reserved Instances (1-3 year commitment, up to 72% savings), Azure Hybrid Benefit (use existing licenses), Spot Instances (up to 90% off).</p>
+                    </div>
+                </div>
+
+                <h3>Region Selection Steps</h3>
+                <ol class="step-list">
+                    <li>
+                        <strong>Identify User Locations</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Check Azure regions with availability zones
+az account list-locations --query "[?metadata.regionType=='Physical'].{Name:name, DisplayName:displayName, Zones:metadata.physicalLocation}" -o table</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Check Service Availability</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># List available services in a region
+az provider list --query "[].{Provider:namespace, ResourceTypes:resourceTypes[].resourceType}" -o table</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Verify Compliance Requirements</strong>
+                        <p>Check data residency laws, GDPR requirements, industry standards (HIPAA, PCI DSS), and government regulations.</p>
+                    </li>
+                    <li>
+                        <strong>Compare Pricing</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Use Azure Pricing Calculator
+https://azure.microsoft.com/en-us/pricing/calculator/</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Test Latency</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Test latency to Azure regions
+# Use Azure Speed Test: https://www.azurespeed.com/</code>
+                        </div>
+                    </li>
+                </ol>
+
+                <h3>Real-Time Usage Scenarios</h3>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li><strong>Global Web Application:</strong> Deploy in multiple regions (US East, West Europe, Southeast Asia) with Traffic Manager for load balancing</li>
+                    <li><strong>Financial Services:</strong> Use Germany Central for EU data residency, with Germany Northeast as paired region</li>
+                    <li><strong>Media Streaming:</strong> CDN with multiple regional origins for low latency content delivery</li>
+                    <li><strong>IoT Applications:</strong> Regional IoT Hubs near device locations, with central data lake for analytics</li>
+                    <li><strong>AI/ML Workloads:</strong> Use regions with GPU availability (East US, West US 2, North Europe)</li>
+                </ul>
+
+                <div class="do-dont-grid">
+                    <div class="do-section">
+                        <h4>✓ DO's</h4>
+                        <ul>
+                            <li>Use availability zones for production workloads</li>
+                            <li>Deploy in region closest to users</li>
+                            <li>Use region pairs for DR strategy</li>
+                            <li>Check service availability before deployment</li>
+                            <li>Compare regional pricing</li>
+                            <li>Implement geo-replication for critical data</li>
+                            <li>Use Azure Advisor for recommendations</li>
+                        </ul>
+                    </div>
+                    <div class="dont-section">
+                        <h4>✗ DON'Ts</h4>
+                        <ul>
+                            <li>Don't ignore data residency requirements</li>
+                            <li>Don't deploy all resources in single region</li>
+                            <li>Don't forget about inter-region data transfer costs</li>
+                            <li>Don't use regions without availability zones for prod</li>
+                            <li>Don't ignore latency requirements</li>
+                            <li>Don't deploy without disaster recovery plan</li>
+                            <li>Don't forget to monitor cross-region traffic</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STORAGE ACCOUNTS SECTION -->
+        <div id="storage" class="content-section">
+            <div class="card">
+                <h2>💾 Azure Storage Accounts</h2>
+                
+                <div class="alert alert-info">
+                    <strong>What:</strong> A unique namespace in Azure that provides access to Azure Storage services: Blobs, Files, Queues, Tables, and Disks. Each storage account has a globally unique name.
+                </div>
+
+                <h3>Storage Account Architecture</h3>
+                <div class="diagram-container">
+        <div class="mermaid">
+graph LR
+    A[Account] --> B[Blobs]
+    A --> C[Files]
+    A --> D[Queues]
+    A --> E[Tables]
+    B --> F[Containers]
+    F --> G[Block]
+    F --> H[Append]
+    F --> I[Page]
+    B --> J[Hot]
+    B --> K[Cool]
+    B --> L[Archive]
+        </div>
+                </div>
+
+                <h3>Storage Account Types (Dec 2025)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Supported Services</th>
+                                <th>Performance</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Standard GPv2</strong></td>
+                                <td>Blob, File, Queue, Table, Disk</td>
+                                <td>Standard</td>
+                                <td>General purpose, recommended for most scenarios</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Premium Block Blobs</strong></td>
+                                <td>Block and Append Blobs only</td>
+                                <td>Premium (SSD)</td>
+                                <td>High transaction rates, low latency</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Premium File Shares</strong></td>
+                                <td>File Storage only</td>
+                                <td>Premium (SSD)</td>
+                                <td>High-performance file shares</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Premium Page Blobs</strong></td>
+                                <td>Page Blobs only</td>
+                                <td>Premium (SSD)</td>
+                                <td>VM disks, IaaS workloads</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Why Use Storage Accounts?</h3>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li><strong>Scalability:</strong> Petabyte-scale storage with automatic scaling</li>
+                    <li><strong>Durability:</strong> 99.999999999% (11 9's) durability with redundancy</li>
+                    <li><strong>Security:</strong> Encryption at rest, in transit, RBAC, firewalls</li>
+                    <li><strong>Accessibility:</strong> REST APIs, SDKs, Azure Portal, CLI, PowerShell</li>
+                    <li><strong>Cost-Effective:</strong> Pay only for storage used, multiple tiers</li>
+                </ul>
+
+                <h3>Creating Storage Account - Step by Step</h3>
+                <ol class="step-list">
+                    <li>
+                        <strong>Define Naming Convention</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Naming Format: {company}{environment}{region}{purpose}{number}
+# Examples:
+# contosoprodeastdata01
+# fabrikamdevwestapp01
+# acmeqaeuropeblob01
+
+# Rules:
+# - 3-24 characters
+# - Lowercase letters and numbers only
+# - Must be globally unique
+# - No hyphens or special characters</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Create Resource Group (if needed)</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code>az group create \
+  --name rg-storage-prod-eastus \
+  --location eastus \
+  --tags Environment=Production Department=IT CostCenter=12345</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Create Storage Account</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code>az storage account create \
+  --name contosoprodeastdata01 \
+  --resource-group rg-storage-prod-eastus \
+  --location eastus \
+  --sku Standard_ZRS \
+  --kind StorageV2 \
+  --access-tier Hot \
+  --https-only true \
+  --min-tls-version TLS1_2 \
+  --allow-blob-public-access false \
+  --tags Environment=Production Application=DataLake Owner=DataTeam</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Enable Features (Optional)</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Enable hierarchical namespace for ADLS Gen2
+az storage account hns-migration start \
+  --account-name contosoprodeastdata01 \
+  --resource-group rg-storage-prod-eastus
+
+# Enable versioning for blobs
+az storage account blob-service-properties update \
+  --account-name contosoprodeastdata01 \
+  --resource-group rg-storage-prod-eastus \
+  --enable-versioning true
+
+# Enable soft delete
+az storage blob service-properties delete-policy update \
+  --account-name contosoprodeastdata01 \
+  --resource-group rg-storage-prod-eastus \
+  --days-retained 7 \
+  --enable true</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Configure Network Security</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Restrict access to specific virtual networks
+az storage account network-rule add \
+  --account-name contosoprodeastdata01 \
+  --resource-group rg-storage-prod-eastus \
+  --vnet-name vnet-prod-eastus \
+  --subnet subnet-storage
+
+# Add firewall rule for specific IP
+az storage account network-rule add \
+  --account-name contosoprodeastdata01 \
+  --resource-group rg-storage-prod-eastus \
+  --ip-address 203.0.113.0/24</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Assign RBAC Permissions</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Assign Storage Blob Data Contributor role
+az role assignment create \
+  --assignee <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="116462746351727e7f657e627e3f727e7c">[email&#160;protected]</a> \
+  --role "Storage Blob Data Contributor" \
+  --scope /subscriptions/{subscription-id}/resourceGroups/rg-storage-prod-eastus/providers/Microsoft.Storage/storageAccounts/contosoprodeastdata01</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Verify Configuration</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Show storage account details
+az storage account show \
+  --name contosoprodeastdata01 \
+  --resource-group rg-storage-prod-eastus \
+  --query '{Name:name, Location:location, SKU:sku.name, Kind:kind, AccessTier:accessTier, HNS:isHnsEnabled}' \
+  --output table</code>
+                        </div>
+                    </li>
+                </ol>
+
+                <h3>Naming Conventions Best Practices</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Format</th>
+                                <th>Example</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Company/Org</td>
+                                <td>3-8 chars</td>
+                                <td>contoso, fabrikam</td>
+                                <td>Identify organization</td>
+                            </tr>
+                            <tr>
+                                <td>Environment</td>
+                                <td>3-4 chars</td>
+                                <td>prod, dev, qa, uat</td>
+                                <td>Deployment stage</td>
+                            </tr>
+                            <tr>
+                                <td>Region</td>
+                                <td>4-6 chars</td>
+                                <td>east, west, europe</td>
+                                <td>Azure region</td>
+                            </tr>
+                            <tr>
+                                <td>Purpose</td>
+                                <td>4-8 chars</td>
+                                <td>data, app, blob, logs</td>
+                                <td>Storage purpose</td>
+                            </tr>
+                            <tr>
+                                <td>Instance</td>
+                                <td>2 digits</td>
+                                <td>01, 02, 03</td>
+                                <td>Multiple instances</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>💰 Storage Account Costing (Dec 2025)</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Storage Capacity</h4>
+                        <p>Hot: $0.0184/GB, Cool: $0.01/GB, Archive: $0.00099/GB (East US prices)</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Transactions</h4>
+                        <p>Write: $0.05/10K, Read: $0.004/10K, List: $0.05/10K operations</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Data Transfer</h4>
+                        <p>Ingress: Free, Egress: First 100GB free, then $0.087/GB</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Replication</h4>
+                        <p>LRS: Baseline, ZRS: +25%, GRS: +100%, RA-GRS: +125%</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>Cost Optimization Tips:</strong> Use lifecycle policies to move old data to Cool/Archive, enable blob versioning only when needed, use ZRS instead of GRS if cross-region isn't required, monitor and delete unused containers, compress data before storage.
+                </div>
+
+                <div class="do-dont-grid">
+                    <div class="do-section">
+                        <h4>✓ DO's</h4>
+                        <ul>
+                            <li>Use descriptive, consistent naming conventions</li>
+                            <li>Enable soft delete for accidental deletion protection</li>
+                            <li>Implement lifecycle management policies</li>
+                            <li>Use Azure Key Vault for connection strings</li>
+                            <li>Enable versioning for critical data</li>
+                            <li>Tag resources for cost tracking</li>
+                            <li>Use private endpoints for secure access</li>
+                            <li>Enable diagnostic logs for monitoring</li>
+                        </ul>
+                    </div>
+                    <div class="dont-section">
+                        <h4>✗ DON'Ts</h4>
+                        <ul>
+                            <li>Don't use generic names like "storage1"</li>
+                            <li>Don't enable public blob access without review</li>
+                            <li>Don't use account keys in code</li>
+                            <li>Don't ignore storage capacity alerts</li>
+                            <li>Don't mix production and dev in same account</li>
+                            <li>Don't forget to rotate access keys</li>
+                            <li>Don't disable HTTPS-only access</li>
+                            <li>Don't skip network security configuration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REDUNDANCY SECTION -->
+        <div id="redundancy" class="content-section">
+            <div class="card">
+                <h2>🔄 Storage Redundancy Models</h2>
+                
+                <div class="alert alert-info">
+                    <strong>What:</strong> Azure Storage replicates your data to protect against planned and unplanned events, including hardware failures, network/power outages, and natural disasters. Redundancy ensures high availability and durability.
+                </div>
+
+                <h3>Redundancy Options Comparison</h3>
+                <div class="diagram-container">
+        <div class="mermaid">
+graph TB
+    A[Redundancy] --> B[Single-Region]
+    A --> C[Multi-Region]
+    B --> D[LRS]
+    B --> E[ZRS]
+    C --> F[GRS]
+    C --> G[RA-GRS]
+    C --> H[GZRS]
+    C --> I[RA-GZRS]
+        </div>
+                </div>
+
+                <h3>Detailed Redundancy Models</h3>
+                
+                <div class="card" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+                    <h3>1️⃣ LRS - Locally Redundant Storage</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <p><span class="badge badge-what">WHAT</span> Three synchronous copies within a single physical location (datacenter) in the primary region.</p>
+                            <p><span class="badge badge-why">WHY</span> Lowest cost option, protects against server rack and drive failures.</p>
+                        </div>
+                        <div>
+                            <p><span class="badge badge-when">WHEN</span> Non-critical data, dev/test environments, cost-sensitive workloads.</p>
+                            <p><span class="badge badge-how">HOW</span> Data replicated 3 times within same datacenter zone.</p>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Durability</h4>
+                            <p>99.999999999% (11 nines) over a year</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Availability SLA</h4>
+                            <p>Read: 99.9%, Write: 99.9%</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Cost</h4>
+                            <p>Baseline pricing, lowest cost option</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>RPO/RTO</h4>
+                            <p>RPO: Minutes, RTO: Minutes</p>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code>az storage account create \
+  --name mydevstorageeast01 \
+  --resource-group rg-dev-eastus \
+  --location eastus \
+  --sku Standard_LRS \
+  --kind StorageV2</code>
+                    </div>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-left-color: #4caf50;">
+                    <h3>2️⃣ ZRS - Zone-Redundant Storage</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <p><span class="badge badge-what">WHAT</span> Three synchronous copies across three availability zones in the primary region.</p>
+                            <p><span class="badge badge-why">WHY</span> High availability within region, protects against datacenter failures.</p>
+                        </div>
+                        <div>
+                            <p><span class="badge badge-when">WHEN</span> Production workloads requiring high availability, mission-critical apps.</p>
+                            <p><span class="badge badge-how">HOW</span> Data spread across 3 physically separated zones with independent infrastructure.</p>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Durability</h4>
+                            <p>99.9999999999% (12 nines) over a year</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Availability SLA</h4>
+                            <p>Read: 99.9%, Write: 99.9%</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Cost</h4>
+                            <p>~25% more than LRS</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>RPO/RTO</h4>
+                            <p>RPO: Zero, RTO: Minutes</p>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code>az storage account create \
+  --name myprodstorageeast01 \
+  --resource-group rg-prod-eastus \
+  --location eastus \
+  --sku Standard_ZRS \
+  --kind StorageV2</code>
+                    </div>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-left-color: #ff9800;">
+                    <h3>3️⃣ GRS - Geo-Redundant Storage</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <p><span class="badge badge-what">WHAT</span> Six copies total: 3 in primary region (LRS) + 3 in secondary region (LRS), 300+ miles apart.</p>
+                            <p><span class="badge badge-why">WHY</span> Protection against regional disasters and outages.</p>
+                        </div>
+                        <div>
+                            <p><span class="badge badge-when">WHEN</span> Disaster recovery requirements, compliance needs, critical business data.</p>
+                            <p><span class="badge badge-how">HOW</span> Asynchronous replication to paired region, secondary read-only (until failover).</p>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Durability</h4>
+                            <p>99.99999999999999% (16 nines) over a year</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Availability SLA</h4>
+                            <p>Read: 99.9%, Write: 99.9%</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Cost</h4>
+                            <p>~100% more than LRS (double)</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>RPO/RTO</h4>
+                            <p>RPO: <15 minutes, RTO: <1 hour</p>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning">
+                        <strong>Important:</strong> Secondary region data is NOT accessible for read unless you initiate a failover or use RA-GRS.
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code>az storage account create \
+  --name mybcpstorageeast01 \
+  --resource-group rg-prod-eastus \
+  --location eastus \
+  --sku Standard_GRS \
+  --kind StorageV2</code>
+                    </div>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border-left-color: #9c27b0;">
+                    <h3>4️⃣ RA-GRS - Read-Access Geo-Redundant Storage</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <p><span class="badge badge-what">WHAT</span> Same as GRS but with read access to secondary region at all times.</p>
+                            <p><span class="badge badge-why">WHY</span> Enables read access during primary region outage, load balancing reads across regions.</p>
+                        </div>
+                        <div>
+                            <p><span class="badge badge-when">WHEN</span> Applications requiring highest availability, read-heavy workloads, global distribution.</p>
+                            <p><span class="badge badge-how">HOW</span> Secondary endpoint always available for reads (accountname-secondary.blob.core.windows.net).</p>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Durability</h4>
+                            <p>99.99999999999999% (16 nines) over a year</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Availability SLA</h4>
+                            <p>Read: 99.99%, Write: 99.9%</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Cost</h4>
+                            <p>~125% more than LRS</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>RPO/RTO</h4>
+                            <p>RPO: <15 minutes, RTO: Zero (read)</p>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code>az storage account create \
+  --name myglobalstorageeast01 \
+  --resource-group rg-prod-eastus \
+  --location eastus \
+  --sku Standard_RAGRS \
+  --kind StorageV2
+
+# Access secondary endpoint
+# Primary: https://myglobalstorageeast01.blob.core.windows.net
+# Secondary: https://myglobalstorageeast01-secondary.blob.core.windows.net</code>
+                    </div>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%); border-left-color: #009688;">
+                    <h3>5️⃣ GZRS - Geo-Zone-Redundant Storage</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <p><span class="badge badge-what">WHAT</span> Six copies: 3 across zones in primary region (ZRS) + 3 in secondary region (LRS).</p>
+                            <p><span class="badge badge-why">WHY</span> Combines high availability of ZRS with disaster recovery of GRS.</p>
+                        </div>
+                        <div>
+                            <p><span class="badge badge-when">WHEN</span> Mission-critical data requiring maximum availability and durability.</p>
+                            <p><span class="badge badge-how">HOW</span> Zone redundancy in primary + geo-replication to secondary region.</p>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Durability</h4>
+                            <p>99.99999999999999% (16 nines) over a year</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Availability SLA</h4>
+                            <p>Read: 99.9%, Write: 99.9%</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Cost</h4>
+                            <p>Highest cost (combines ZRS + GRS premiums)</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>RPO/RTO</h4>
+                            <p>RPO: <15 minutes, RTO: Minutes</p>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code>az storage account create \
+  --name mycriticalstorageeast01 \
+  --resource-group rg-prod-eastus \
+  --location eastus \
+  --sku Standard_GZRS \
+  --kind StorageV2</code>
+                    </div>
+                </div>
+
+                <h3>6️⃣ RA-GZRS - Read-Access Geo-Zone-Redundant Storage</h3>
+                <p>Same as GZRS with read access to secondary region. Provides highest availability (99.99% read SLA) and durability (16 nines).</p>
+
+                <h3>Decision Matrix: Choosing the Right Redundancy</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Requirement</th>
+                                <th>Recommended SKU</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Dev/Test, non-critical</td>
+                                <td>Standard_LRS</td>
+                                <td>Lowest cost, sufficient for temporary data</td>
+                            </tr>
+                            <tr>
+                                <td>Production, single region</td>
+                                <td>Standard_ZRS</td>
+                                <td>High availability within region</td>
+                            </tr>
+                            <tr>
+                                <td>Disaster recovery needed</td>
+                                <td>Standard_GRS</td>
+                                <td>Regional failover capability</td>
+                            </tr>
+                            <tr>
+                                <td>Global read access</td>
+                                <td>Standard_RAGRS</td>
+                                <td>Read from secondary anytime</td>
+                            </tr>
+                            <tr>
+                                <td>Mission-critical, 24/7</td>
+                                <td>Standard_GZRS</td>
+                                <td>Zone + geo redundancy</td>
+                            </tr>
+                            <tr>
+                                <td>Maximum availability</td>
+                                <td>Standard_RAGZRS</td>
+                                <td>Highest SLA (99.99% read)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Changing Redundancy Configuration</h3>
+                <ol class="step-list">
+                    <li>
+                        <strong>Check Current Configuration</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code>az storage account show \
+  --name mystorageaccount \
+  --resource-group myresourcegroup \
+  --query 'sku.name' -o tsv</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Update to New SKU (Some Combinations Allowed)</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Upgrade LRS to ZRS (supported)
+az storage account update \
+  --name mystorageaccount \
+  --resource-group myresourcegroup \
+  --sku Standard_ZRS
+
+# Change GRS to RA-GRS (supported)
+az storage account update \
+  --name mystorageaccount \
+  --resource-group myresourcegroup \
+  --sku Standard_RAGRS</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>For Unsupported Changes (e.g., ZRS to LRS)</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Must create new account and migrate data
+# 1. Create new account with desired SKU
+# 2. Use AzCopy to migrate data
+# 3. Update application endpoints
+# 4. Delete old account after verification</code>
+                        </div>
+                    </li>
+                </ol>
+
+                <h3>Real-World Redundancy Scenarios</h3>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li><strong>E-commerce Website:</strong> RA-GZRS for product catalog (global reads), ZRS for user uploads, LRS for temporary data</li>
+                    <li><strong>Data Lake:</strong> GZRS for raw data, ZRS for processed data, Archive + GRS for long-term retention</li>
+                    <li><strong>Media Streaming:</strong> RA-GRS with CDN for content, ZRS for metadata, LRS for transcoding temp files</li>
+                    <li><strong>Financial Services:</strong> GZRS for transactional data, RA-GZRS for reporting data, regular DR drills</li>
+                    <li><strong>Healthcare Systems:</strong> GZRS for patient records (HIPAA compliance), RA-GZRS for medical imaging</li>
+                </ul>
+
+                <div class="do-dont-grid">
+                    <div class="do-section">
+                        <h4>✓ DO's</h4>
+                        <ul>
+                            <li>Use ZRS minimum for production workloads</li>
+                            <li>Implement GRS/GZRS for critical business data</li>
+                            <li>Test failover procedures regularly</li>
+                            <li>Monitor replication lag for geo-redundant storage</li>
+                            <li>Document RPO/RTO requirements</li>
+                            <li>Use RA-GRS for read-heavy global applications</li>
+                            <li>Consider cost vs. availability trade-offs</li>
+                        </ul>
+                    </div>
+                    <div class="dont-section">
+                        <h4>✗ DON'Ts</h4>
+                        <ul>
+                            <li>Don't use LRS for production critical data</li>
+                            <li>Don't assume GRS provides instant failover</li>
+                            <li>Don't ignore RPO implications (up to 15 min)</li>
+                            <li>Don't use GRS if you need read access to secondary</li>
+                            <li>Don't forget to update app for secondary endpoints</li>
+                            <li>Don't over-provision redundancy for temp data</li>
+                            <li>Don't skip disaster recovery testing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOB STORAGE SECTION -->
+        <div id="blobs" class="content-section">
+            <div class="card">
+                <h2>📦 Azure Blob Storage</h2>
+                
+                <div class="alert alert-info">
+                    <strong>What:</strong> Object storage solution optimized for storing massive amounts of unstructured data like text, binary data, images, videos, backups, and big data analytics.
+                </div>
+
+                <h3>Blob Storage Architecture</h3>
+                <div class="diagram-container">
+        <div class="mermaid">
+graph LR
+    A[Storage] --> B[images]
+    A --> C[videos]
+    A --> D[logs]
+    A --> E[backups]
+    B --> F[Block-Blobs]
+    C --> G[Block-Blobs]
+    D --> H[Append-Blobs]
+    E --> I[Page-Blobs]
+        </div>
+                </div>
+
+                <h3>Blob Types Deep Dive</h3>
+
+                <div class="card" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+                    <h3>📄 Block Blobs</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <p><span class="badge badge-what">WHAT</span> Composed of blocks, each up to 4000 MiB. Max blob size: 190.7 TiB.</p>
+                            <p><span class="badge badge-why">WHY</span> Optimized for upload/download scenarios, efficient for large files.</p>
+                        </div>
+                        <div>
+                            <p><span class="badge badge-when">WHEN</span> Images, videos, documents, backups, data archives.</p>
+                            <p><span class="badge badge-how">HOW</span> Uploaded in blocks (parallel), committed as single blob.</p>
+                        </div>
+                    </div>
+                    <h4>Key Features:</h4>
+                    <ul>
+                        <li>Parallel uploads for performance</li>
+                        <li>Block-level updates (change individual blocks)</li>
+                        <li>Automatic tiering (Hot/Cool/Archive)</li>
+                        <li>Versioning and snapshots</li>
+                        <li>Client-side encryption support</li>
+                    </ul>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code># Upload a block blob
+az storage blob upload \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name myfile.mp4 \
+  --file /local/path/myfile.mp4 \
+  --type block \
+  --tier Hot
+
+# Upload with parallel blocks for large files
+az storage blob upload \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name largefile.zip \
+  --file /local/path/largefile.zip \
+  --max-connections 8</code>
+                    </div>
+                    <h4>Use Cases:</h4>
+                    <p>Media files (images, videos, audio), software installers, database backups, data lakes, content delivery, archive storage.</p>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-left-color: #4caf50;">
+                    <h3>📝 Append Blobs</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <p><span class="badge badge-what">WHAT</span> Optimized for append operations. Max blob size: 195 GiB.</p>
+                            <p><span class="badge badge-why">WHY</span> Efficient for scenarios where data is only added, never updated.</p>
+                        </div>
+                        <div>
+                            <p><span class="badge badge-when">WHEN</span> Logging, audit trails, telemetry, streaming data ingestion.</p>
+                            <p><span class="badge badge-how">HOW</span> Add blocks to end of blob only, no random writes.</p>
+                        </div>
+                    </div>
+                    <h4>Key Features:</h4>
+                    <ul>
+                        <li>Append-only operations (no updates to existing blocks)</li>
+                        <li>Maximum 50,000 blocks per blob</li>
+                        <li>Each block up to 4 MiB</li>
+                        <li>Ideal for sequential write scenarios</li>
+                        <li>Atomic append operations</li>
+                    </ul>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code># Create append blob
+az storage blob upload \
+  --account-name mystorageaccount \
+  --container-name logs \
+  --name application.log \
+  --file /local/logs/initial.log \
+  --type append
+
+# Append to existing blob (using SDK or REST API)
+# PowerShell example:
+$context = New-AzStorageContext -StorageAccountName "mystorageaccount" -StorageAccountKey "key"
+$content = Get-Content -Path "new-logs.txt" -Raw
+$blob = Get-AzStorageBlob -Context $context -Container "logs" -Blob "application.log"
+$blob.ICloudBlob.AppendText($content)</code>
+                    </div>
+                    <h4>Use Cases:</h4>
+                    <p>Application logs, system logs, audit logs, IoT telemetry, streaming data capture, event logs, continuous data append scenarios.</p>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-left-color: #ff9800;">
+                    <h3>💿 Page Blobs</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <p><span class="badge badge-what">WHAT</span> Collection of 512-byte pages optimized for random read/write. Max size: 8 TiB.</p>
+                            <p><span class="badge badge-why">WHY</span> Support frequent random read/write operations, essential for VM disks.</p>
+                        </div>
+                        <div>
+                            <p><span class="badge badge-when">WHEN</span> Azure VM disks (OS and data disks), database files requiring random I/O.</p>
+                            <p><span class="badge badge-how">HOW</span> Write/read specific 512-byte pages without affecting others.</p>
+                        </div>
+                    </div>
+                    <h4>Key Features:</h4>
+                    <ul>
+                        <li>Random read/write access at 512-byte page level</li>
+                        <li>Used for Azure Virtual Machine disks (VHD/VHDX)</li>
+                        <li>Sparse allocation (only pay for used pages)</li>
+                        <li>Snapshot support for backups</li>
+                        <li>Premium and Standard tiers available</li>
+                    </ul>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code># Create page blob (usually managed by Azure for VM disks)
+az storage blob upload \
+  --account-name mystorageaccount \
+  --container-name vhds \
+  --name mydisk.vhd \
+  --file /local/path/mydisk.vhd \
+  --type page
+
+# For VM disks, Azure manages this automatically
+az vm create \
+  --resource-group myResourceGroup \
+  --name myVM \
+  --image Ubuntu2204 \
+  --storage-sku Premium_LRS</code>
+                    </div>
+                    <div class="alert alert-warning">
+                        <strong>Note:</strong> Managed Disks are now recommended over page blobs for VM storage. Azure handles page blob operations automatically.
+                    </div>
+                    <h4>Use Cases:</h4>
+                    <p>Azure VM disks (OS disks, data disks), database files (SQL Server data files), applications requiring random I/O patterns.</p>
+                </div>
+
+                <h3>🌡️ Access Tiers</h3>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tier</th>
+                                <th>Storage Cost</th>
+                                <th>Access Cost</th>
+                                <th>Access Time</th>
+                                <th>Min Duration</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Hot</strong></td>
+                                <td>Highest ($0.0184/GB)</td>
+                                <td>Lowest</td>
+                                <td>Immediate</td>
+                                <td>None</td>
+                                <td>Frequently accessed data</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cool</strong></td>
+                                <td>Lower ($0.01/GB)</td>
+                                <td>Higher</td>
+                                <td>Immediate</td>
+                                <td>30 days</td>
+                                <td>Infrequently accessed, stored 30+ days</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cold</strong></td>
+                                <td>Lower ($0.0045/GB)</td>
+                                <td>Higher</td>
+                                <td>Immediate</td>
+                                <td>90 days</td>
+                                <td>Rarely accessed, stored 90+ days</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Archive</strong></td>
+                                <td>Lowest ($0.00099/GB)</td>
+                                <td>Highest</td>
+                                <td>Hours (rehydrate)</td>
+                                <td>180 days</td>
+                                <td>Long-term backup, compliance</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Setting Access Tiers</h3>
+                <ol class="step-list">
+                    <li>
+                        <strong>Set Default Tier at Account Level</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code>az storage account create \
+  --name mystorageaccount \
+  --resource-group myresourcegroup \
+  --location eastus \
+  --sku Standard_LRS \
+  --access-tier Hot</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Set Tier for Individual Blob</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Upload with specific tier
+az storage blob upload \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name myfile.zip \
+  --file /local/myfile.zip \
+  --tier Cool
+
+# Change existing blob tier
+az storage blob set-tier \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name myfile.zip \
+  --tier Archive</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Rehydrate from Archive</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Standard rehydration (up to 15 hours)
+az storage blob set-tier \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name archived-file.zip \
+  --tier Hot \
+  --rehydrate-priority Standard
+
+# High-priority rehydration (<1 hour)
+az storage blob set-tier \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name archived-file.zip \
+  --tier Hot \
+  --rehydrate-priority High</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Implement Lifecycle Management</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Create lifecycle policy JSON
+cat > lifecycle-policy.json <<'EOF'
+{
+  "rules": [
+    {
+      "enabled": true,
+      "name": "move-to-cool",
+      "type": "Lifecycle",
+      "definition": {
+        "actions": {
+          "baseBlob": {
+            "tierToCool": {
+              "daysAfterModificationGreaterThan": 30
+            },
+            "tierToArchive": {
+              "daysAfterModificationGreaterThan": 90
+            },
+            "delete": {
+              "daysAfterModificationGreaterThan": 365
+            }
+          },
+          "snapshot": {
+            "delete": {
+              "daysAfterCreationGreaterThan": 90
+            }
+          }
+        },
+        "filters": {
+          "blobTypes": ["blockBlob"],
+          "prefixMatch": ["data/"]
+        }
+      }
+    }
+  ]
+}
+EOF
+
+# Apply lifecycle policy
+az storage account management-policy create \
+  --account-name mystorageaccount \
+  --resource-group myresourcegroup \
+  --policy @lifecycle-policy.json</code>
+                        </div>
+                    </li>
+                </ol>
+
+                <h3>🗂️ Containers</h3>
+
+                <div class="alert alert-info">
+                    <strong>What:</strong> Logical grouping of blobs, similar to directories. All blobs must reside in a container. A storage account can have unlimited containers, and each container can store unlimited blobs.
+                </div>
+
+                <h3>Container Access Levels</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Private (Default)</h4>
+                        <p>No anonymous access. Authentication required for all operations.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Blob</h4>
+                        <p>Anonymous read access to blobs only, not container metadata.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Container</h4>
+                        <p>Anonymous read access to blobs and container properties/metadata.</p>
+                    </div>
+                </div>
+
+                <h3>Container Operations</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code># Create container
+az storage container create \
+  --account-name mystorageaccount \
+  --name mycontainer \
+  --public-access off \
+  --metadata department=finance environment=production
+
+# List containers
+az storage container list \
+  --account-name mystorageaccount \
+  --output table
+
+# Set container access level
+az storage container set-permission \
+  --account-name mystorageaccount \
+  --name mycontainer \
+  --public-access blob
+
+# Delete container
+az storage container delete \
+  --account-name mystorageaccount \
+  --name mycontainer</code>
+                </div>
+
+                <h3>Best Practices: Blob Naming Conventions</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pattern</th>
+                                <th>Example</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Date-based</td>
+                                <td>logs/2025/12/29/app-log.txt</td>
+                                <td>Time-series data, logs</td>
+                            </tr>
+                            <tr>
+                                <td>User-based</td>
+                                <td>users/user123/profile.jpg</td>
+                                <td>User uploads, profiles</td>
+                            </tr>
+                            <tr>
+                                <td>Category-based</td>
+                                <td>products/electronics/laptop-001.jpg</td>
+                                <td>Organized content</td>
+                            </tr>
+                            <tr>
+                                <td>Hash-based</td>
+                                <td>media/a1/b2/c3/file.mp4</td>
+                                <td>Even distribution</td>
+                            </tr>
+                            <tr>
+                                <td>Version-based</td>
+                                <td>releases/v1.2.3/installer.exe</td>
+                                <td>Software versions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="do-dont-grid">
+                    <div class="do-section">
+                        <h4>✓ DO's</h4>
+                        <ul>
+                            <li>Use block blobs for most scenarios</li>
+                            <li>Implement lifecycle policies for cost optimization</li>
+                            <li>Use Cool tier for data accessed less than once/month</li>
+                            <li>Use Archive for compliance/backup (180+ days)</li>
+                            <li>Enable versioning for critical data</li>
+                            <li>Use hierarchical namespaces for large datasets</li>
+                            <li>Leverage parallel uploads for large files</li>
+                            <li>Monitor storage metrics and capacity</li>
+                        </ul>
+                    </div>
+                    <div class="dont-section">
+                        <h4>✗ DON'Ts</h4>
+                        <ul>
+                            <li>Don't use Hot tier for rarely accessed data</li>
+                            <li>Don't forget early deletion fees (Cool: 30 days)</li>
+                            <li>Don't enable public access without security review</li>
+                            <li>Don't use append blobs for random writes</li>
+                            <li>Don't archive data that needs frequent access</li>
+                            <li>Don't ignore rehydration time (up to 15 hours)</li>
+                            <li>Don't store sensitive data without encryption</li>
+                            <li>Don't use page blobs for sequential data</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADLS GEN2 SECTION -->
+        <div id="adls" class="content-section">
+            <div class="card">
+                <h2>🏔️ Azure Data Lake Storage Gen2</h2>
+                
+                <div class="alert alert-info">
+                    <strong>What:</strong> ADLS Gen2 combines the scalability and cost-effectiveness of object storage with the reliability and performance of Big Data file system capabilities. It's essentially Blob Storage with a hierarchical namespace and enhanced security features.
+                </div>
+
+                <h3>ADLS Gen2 Architecture</h3>
+                <div class="diagram-container">
+        <div class="mermaid">
+graph TB
+    A[ADLS-Gen2] --> B[Blob-Foundation]
+    A --> C[Hierarchical-NS]
+    A --> D[Security]
+    C --> E[raw]
+    C --> F[processed]
+    C --> G[curated]
+    D --> H[RBAC]
+    D --> I[ACLs]
+        </div>
+                </div>
+
+                <h3>Key Differences: Blob Storage vs ADLS Gen2</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Blob Storage</th>
+                                <th>ADLS Gen2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>Flat (object store)</td>
+                                <td>Hierarchical (file system)</td>
+                            </tr>
+                            <tr>
+                                <td>Directory Operations</td>
+                                <td>Prefix-based (slow)</td>
+                                <td>Atomic directory operations (fast)</td>
+                            </tr>
+                            <tr>
+                                <td>Performance</td>
+                                <td>Good</td>
+                                <td>Optimized for analytics (higher throughput)</td>
+                            </tr>
+                            <tr>
+                                <td>Security Model</td>
+                                <td>RBAC + SAS</td>
+                                <td>RBAC + POSIX ACLs (file/folder level)</td>
+                            </tr>
+                            <tr>
+                                <td>Hadoop Compatibility</td>
+                                <td>Limited (WASB driver)</td>
+                                <td>Full (ABFS driver)</td>
+                            </tr>
+                            <tr>
+                                <td>Rename Operations</td>
+                                <td>Copy + Delete</td>
+                                <td>Atomic metadata operation</td>
+                            </tr>
+                            <tr>
+                                <td>Cost</td>
+                                <td>Standard blob pricing</td>
+                                <td>Same as blob + minimal HNS overhead</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>🏗️ Hierarchical Namespace (HNS)</h3>
+
+                <div class="alert alert-info">
+                    <strong>What:</strong> HNS organizes objects/files into a hierarchy of directories for efficient data management, just like a traditional file system. This enables atomic directory operations and improved performance for big data workloads.
+                </div>
+
+                <h3>Without HNS vs With HNS</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0;">
+                    <div class="card" style="background: #fef3c7;">
+                        <h4>❌ Without HNS (Flat)</h4>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code>container/
+  data/sales/2025/01/file1.csv
+  data/sales/2025/02/file2.csv
+  data/marketing/2025/01/file3.csv
+
+# Renaming "sales" to "revenue" requires:
+# 1. Copy all objects
+# 2. Delete all old objects
+# (Expensive and time-consuming)</code>
+                        </div>
+                    </div>
+                    <div class="card" style="background: #d1fae5;">
+                        <h4>✅ With HNS (Hierarchical)</h4>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code>filesystem/
+  data/
+    sales/
+      2025/
+        01/
+          file1.csv
+        02/
+          file2.csv
+    marketing/
+      2025/
+        01/
+          file3.csv
+
+# Renaming "sales" to "revenue":
+# Single metadata operation (instant)</code>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Creating ADLS Gen2 Account</h3>
+                <ol class="step-list">
+                    <li>
+                        <strong>Create Storage Account with HNS Enabled</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code>az storage account create \
+  --name myadlsgen2account \
+  --resource-group rg-datalake-prod \
+  --location eastus \
+  --sku Standard_ZRS \
+  --kind StorageV2 \
+  --hierarchical-namespace true \
+  --access-tier Hot \
+  --https-only true \
+  --min-tls-version TLS1_2 \
+  --tags Environment=Production DataClassification=Sensitive</code>
+                        </div>
+                        <div class="alert alert-danger">
+                            <strong>Important:</strong> HNS cannot be enabled after account creation. Plan accordingly!
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Create Filesystem (Container)</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code>az storage fs create \
+  --name datalake \
+  --account-name myadlsgen2account \
+  --auth-mode login</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Create Directory Structure</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Create directories
+az storage fs directory create \
+  --name raw \
+  --file-system datalake \
+  --account-name myadlsgen2account \
+  --auth-mode login
+
+az storage fs directory create \
+  --name processed \
+  --file-system datalake \
+  --account-name myadlsgen2account \
+  --auth-mode login
+
+az storage fs directory create \
+  --name curated \
+  --file-system datalake \
+  --account-name myadlsgen2account \
+  --auth-mode login
+
+# Create nested directories
+az storage fs directory create \
+  --name raw/sales/2025/12 \
+  --file-system datalake \
+  --account-name myadlsgen2account \
+  --auth-mode login</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Upload Files</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Upload file to directory
+az storage fs file upload \
+  --source /local/data/sales-2025-12-29.csv \
+  --path raw/sales/2025/12/sales-2025-12-29.csv \
+  --file-system datalake \
+  --account-name myadlsgen2account \
+  --auth-mode login
+
+# Upload entire directory
+az storage fs directory upload \
+  --source /local/data/sales/2025/12/ \
+  --file-system datalake \
+  --destination-path raw/sales/2025/12/ \
+  --account-name myadlsgen2account \
+  --recursive \
+  --auth-mode login</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Set POSIX ACLs</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Set ACL on directory
+az storage fs access set \
+  --acl "user::rwx,group::r-x,other::---,user:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1b6e687e69757a767e5b7f74767a727535787476">[email&#160;protected]</a>:r-x" \
+  --path raw/sales \
+  --file-system datalake \
+  --account-name myadlsgen2account \
+  --auth-mode login
+
+# Set default ACL (inherited by new files/directories)
+az storage fs access set \
+  --acl "default:user::rwx,default:group::r-x,default:other::---" \
+  --path raw/sales \
+  --file-system datalake \
+  --account-name myadlsgen2account \
+  --auth-mode login</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Assign RBAC Roles</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Storage Blob Data Owner (full control)
+az role assignment create \
+  --assignee <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9bfffaeffafef5fcb6effefaf6dbf8f4f6ebfaf5e2b5f8f4f6">[email&#160;protected]</a> \
+  --role "Storage Blob Data Owner" \
+  --scope /subscriptions/{sub-id}/resourceGroups/rg-datalake-prod/providers/Microsoft.Storage/storageAccounts/myadlsgen2account
+
+# Storage Blob Data Contributor (read/write)
+az role assignment create \
+  --assignee <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="51353427343d3e2134232211323e3c21303f287f323e3c">[email&#160;protected]</a> \
+  --role "Storage Blob Data Contributor" \
+  --scope /subscriptions/{sub-id}/resourceGroups/rg-datalake-prod/providers/Microsoft.Storage/storageAccounts/myadlsgen2account/blobServices/default/containers/datalake
+
+# Storage Blob Data Reader (read-only)
+az role assignment create \
+  --assignee <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c3d323d30252f282f1c3f33312c3d3225723f3331">[email&#160;protected]</a> \
+  --role "Storage Blob Data Reader" \
+  --scope /subscriptions/{sub-id}/resourceGroups/rg-datalake-prod/providers/Microsoft.Storage/storageAccounts/myadlsgen2account/blobServices/default/containers/datalake</code>
+                        </div>
+                    </li>
+                </ol>
+
+                <h3>🔐 Access Control: RBAC vs ACLs</h3>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>RBAC</th>
+                                <th>POSIX ACLs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Scope</td>
+                                <td>Account, container, or folder level</td>
+                                <td>File and folder level (granular)</td>
+                            </tr>
+                            <tr>
+                                <td>Management</td>
+                                <td>Azure Portal, Azure AD</td>
+                                <td>Storage Explorer, CLI, SDKs</td>
+                            </tr>
+                            <tr>
+                                <td>Propagation</td>
+                                <td>Automatic (inherited)</td>
+                                <td>Must set default ACLs for inheritance</td>
+                            </tr>
+                            <tr>
+                                <td>Use Case</td>
+                                <td>High-level permissions (teams, groups)</td>
+                                <td>Fine-grained permissions (specific paths)</td>
+                            </tr>
+                            <tr>
+                                <td>Performance</td>
+                                <td>Fast (Azure AD check)</td>
+                                <td>Slower (ACL evaluation for each access)</td>
+                            </tr>
+                            <tr>
+                                <td>Best Practice</td>
+                                <td>Use for general access control</td>
+                                <td>Use for specific exceptions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Best Practice:</strong> Use RBAC for broad permissions (e.g., team-level access) and ACLs for fine-grained control (e.g., specific sensitive folders). Both are evaluated, and the more restrictive permission applies.
+                </div>
+
+                <h3>📁 Data Organization Patterns</h3>
+
+                <div class="card" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                    <h4>1. Zone-Based Architecture (Recommended)</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code>datalake/
+  ├── raw/                    # Landing zone (bronze)
+  │   ├── source1/
+  │   │   └── YYYY/MM/DD/
+  │   └── source2/
+  │       └── YYYY/MM/DD/
+  ├── processed/              # Cleansed data (silver)
+  │   ├── sales/
+  │   └── customers/
+  ├── curated/                # Business-ready (gold)
+  │   ├── reports/
+  │   └── analytics/
+  └── archive/                # Historical data
+      └── YYYY/</code>
+                    </div>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+                    <h4>2. Project-Based Architecture</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code>datalake/
+  ├── project-alpha/
+  │   ├── data/
+  │   ├── notebooks/
+  │   └── models/
+  ├── project-beta/
+  │   ├── data/
+  │   ├── notebooks/
+  │   └── models/
+  └── shared/
+      ├── reference-data/
+      └── utilities/</code>
+                    </div>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);">
+                    <h4>3. Domain-Driven Architecture</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code>datalake/
+  ├── sales/
+  │   ├── raw/
+  │   ├── processed/
+  │   └── curated/
+  ├── marketing/
+  │   ├── raw/
+  │   ├── processed/
+  │   └── curated/
+  └── finance/
+      ├── raw/
+      ├── processed/
+      └── curated/</code>
+                    </div>
+                </div>
+
+                <h3>🚀 Data Ingestion with AzCopy</h3>
+
+                <div class="alert alert-info">
+                    <strong>What:</strong> AzCopy is a command-line utility for high-performance copying of data to/from Azure Storage. Optimized for large-scale data transfers with parallel operations.
+                </div>
+
+                <ol class="step-list">
+                    <li>
+                        <strong>Install AzCopy</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Linux
+wget https://aka.ms/downloadazcopy-v10-linux
+tar -xvf downloadazcopy-v10-linux
+sudo cp ./azcopy_linux_amd64_*/azcopy /usr/bin/
+
+# Windows (PowerShell)
+Invoke-WebRequest -Uri "https://aka.ms/downloadazcopy-v10-windows" -OutFile azcopy.zip
+Expand-Archive azcopy.zip
+$env:PATH += ";C:\azcopy"
+
+# Verify installation
+azcopy --version</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Authenticate with Azure AD</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Login to Azure AD
+azcopy login
+
+# Or use service principal
+azcopy login --service-principal \
+  --application-id <app-id> \
+  --tenant-id <tenant-id> \
+  --certificate-path <cert-path>
+
+# Or use SAS token (not recommended for production)
+# Include SAS token in URL</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Copy Files to ADLS Gen2</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Copy single file
+azcopy copy '/local/data/file.csv' \
+  'https://myadlsgen2account.dfs.core.windows.net/datalake/raw/file.csv'
+
+# Copy entire directory recursively
+azcopy copy '/local/data/' \
+  'https://myadlsgen2account.dfs.core.windows.net/datalake/raw/' \
+  --recursive
+
+# Copy with pattern matching
+azcopy copy '/local/data/*.csv' \
+  'https://myadlsgen2account.dfs.core.windows.net/datalake/raw/' \
+  --recursive
+
+# Copy with multiple threads (faster)
+azcopy copy '/local/bigdata/' \
+  'https://myadlsgen2account.dfs.core.windows.net/datalake/raw/' \
+  --recursive \
+  --cap-mbps 500 \
+  --block-size-mb 100</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Sync Directories (Incremental Copy)</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Sync local to ADLS Gen2 (only copy new/changed files)
+azcopy sync '/local/data/' \
+  'https://myadlsgen2account.dfs.core.windows.net/datalake/raw/' \
+  --recursive \
+  --delete-destination=false
+
+# Sync with deletion (mirror)
+azcopy sync '/local/data/' \
+  'https://myadlsgen2account.dfs.core.windows.net/datalake/raw/' \
+  --recursive \
+  --delete-destination=true</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Download from ADLS Gen2</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Download directory
+azcopy copy \
+  'https://myadlsgen2account.dfs.core.windows.net/datalake/processed/' \
+  '/local/download/' \
+  --recursive
+
+# Download with filter
+azcopy copy \
+  'https://myadlsgen2account.dfs.core.windows.net/datalake/processed/' \
+  '/local/download/' \
+  --recursive \
+  --include-pattern '*.parquet'</code>
+                        </div>
+                    </li>
+                </ol>
+
+                <h3>📊 Real-Time Usage Scenarios</h3>
+
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li><strong>IoT Data Pipeline:</strong> Raw sensor data → Bronze zone → Streaming processing → Silver zone → Aggregated analytics → Gold zone</li>
+                    <li><strong>Data Warehouse Modernization:</strong> On-premises DB → AzCopy to Bronze → Azure Data Factory transformations → Synapse Analytics → Power BI</li>
+                    <li><strong>Machine Learning:</strong> Training data in Gold zone → Azure ML reads directly → Model artifacts stored in ADLS Gen2 → MLOps pipeline</li>
+                    <li><strong>Log Analytics:</strong> Application logs → ADLS Gen2 → Azure Databricks → Processed insights → Grafana dashboards</li>
+                    <li><strong>Compliance & Archival:</strong> Operational data → 90 days in Hot → Lifecycle policy → Cool tier → After 1 year → Archive tier</li>
+                </ul>
+
+                <div class="do-dont-grid">
+                    <div class="do-section">
+                        <h4>✓ DO's</h4>
+                        <ul>
+                            <li>Enable HNS for analytics workloads</li>
+                            <li>Use zone-based architecture (Bronze/Silver/Gold)</li>
+                            <li>Implement RBAC + ACLs security model</li>
+                            <li>Use AzCopy for large data transfers</li>
+                            <li>Partition data by date for performance</li>
+                            <li>Use Parquet/ORC for analytics (compressed)</li>
+                            <li>Set lifecycle policies for cost optimization</li>
+                            <li>Enable diagnostic logs for monitoring</li>
+                        </ul>
+                    </div>
+                    <div class="dont-section">
+                        <h4>✗ DON'Ts</h4>
+                        <ul>
+                            <li>Don't create ADLS Gen2 without HNS enabled</li>
+                            <li>Don't use flat structure for large datasets</li>
+                            <li>Don't grant overly broad RBAC permissions</li>
+                            <li>Don't store small files (combine them)</li>
+                            <li>Don't ignore ACL inheritance settings</li>
+                            <li>Don't use CSV for large analytics (use Parquet)</li>
+                            <li>Don't forget to encrypt sensitive data</li>
+                            <li>Don't skip capacity planning (quotas)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECURITY SECTION -->
+        <div id="security" class="content-section">
+            <div class="card">
+                <h2>🔒 Security, Encryption & Monitoring</h2>
+                
+                <h3>Security Architecture</h3>
+                <div class="diagram-container">
+        <div class="mermaid">
+graph LR
+    A[Security] --> B[Identity]
+    A --> C[Network]
+    A --> D[Encryption]
+    B --> E[RBAC]
+    B --> F[SAS]
+    C --> G[Firewall]
+    C --> H[Private-Endpoints]
+    D --> I[At-Rest]
+    D --> J[In-Transit]
+        </div>
+                </div>
+
+                <h3>🔐 Encryption</h3>
+
+                <div class="card" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                    <h4>1️⃣ Server-Side Encryption (SSE)</h4>
+                    <div class="alert alert-info">
+                        <strong>What:</strong> Automatic encryption of data at rest. All data written to Azure Storage is encrypted using 256-bit AES encryption (FIPS 140-2 compliant).
+                    </div>
+                    
+                    <h4>Encryption Options:</h4>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Microsoft-Managed Keys (Default)</h4>
+                            <p>Azure manages encryption keys. No configuration needed. Zero cost. Automatically enabled.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Customer-Managed Keys (CMK)</h4>
+                            <p>You control keys in Azure Key Vault. Greater control, key rotation. Slight additional cost.</p>
+                        </div>
+                    </div>
+
+                    <h4>Enable Customer-Managed Keys:</h4>
+                    <ol class="step-list">
+                        <li>
+                            <strong>Create Key Vault and Key</strong>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                <code># Create Key Vault
+az keyvault create \
+  --name myvault-prod-east \
+  --resource-group rg-security \
+  --location eastus \
+  --enable-purge-protection true
+
+# Create encryption key
+az keyvault key create \
+  --vault-name myvault-prod-east \
+  --name storage-encryption-key \
+  --protection software \
+  --kty RSA \
+  --size 2048</code>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Enable Managed Identity on Storage Account</strong>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                <code>az storage account update \
+  --name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --assign-identity</code>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Grant Key Vault Permissions</strong>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                <code># Get storage account principal ID
+principalId=$(az storage account show \
+  --name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --query identity.principalId -o tsv)
+
+# Grant permissions
+az keyvault set-policy \
+  --name myvault-prod-east \
+  --object-id $principalId \
+  --key-permissions get unwrapKey wrapKey</code>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Configure Storage Account to Use CMK</strong>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                <code>az storage account update \
+  --name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --encryption-key-source Microsoft.Keyvault \
+  --encryption-key-vault https://myvault-prod-east.vault.azure.net \
+  --encryption-key-name storage-encryption-key</code>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+                    <h4>2️⃣ Encryption in Transit</h4>
+                    <div class="alert alert-info">
+                        <strong>What:</strong> Data encrypted during transfer between client and Azure using TLS/HTTPS. Protects against man-in-the-middle attacks.
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code># Enforce HTTPS-only access (recommended)
+az storage account update \
+  --name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --https-only true \
+  --min-tls-version TLS1_2
+
+# Verify configuration
+az storage account show \
+  --name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --query '{HTTPSOnly:enableHttpsTrafficOnly, MinTLS:minimumTlsVersion}'</code>
+                    </div>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);">
+                    <h4>3️⃣ Client-Side Encryption</h4>
+                    <div class="alert alert-info">
+                        <strong>What:</strong> Data encrypted on client before uploading to Azure. You manage encryption keys. Maximum security (Azure never sees unencrypted data).
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code># Example with Azure Storage SDK for Python
+from azure.storage.blob import BlobServiceClient
+from azure.keyvault.keys.crypto import CryptographyClient
+from azure.identity import DefaultAzureCredential
+
+# Client encrypts data before upload
+# Azure stores encrypted data
+# Client decrypts after download
+
+# Implementation requires SDK-specific code</code>
+                    </div>
+                </div>
+
+                <h3>🔐 Access Control Methods</h3>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Scope</th>
+                                <th>Duration</th>
+                                <th>Use Case</th>
+                                <th>Security</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Azure AD RBAC</strong></td>
+                                <td>Account to container</td>
+                                <td>Permanent</td>
+                                <td>User/app identity, enterprise integration</td>
+                                <td>Highest (recommended)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Account Keys</strong></td>
+                                <td>Full account access</td>
+                                <td>Until rotated</td>
+                                <td>Admin operations, legacy apps</td>
+                                <td>Lowest (avoid if possible)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SAS Tokens</strong></td>
+                                <td>Specific resource/operation</td>
+                                <td>Time-limited</td>
+                                <td>Temporary access, external sharing</td>
+                                <td>Medium (time-bound)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Managed Identity</strong></td>
+                                <td>Service-to-service</td>
+                                <td>Automatic</td>
+                                <td>Azure services, VMs, containers</td>
+                                <td>High (no credentials)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Creating SAS Tokens</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code># Account SAS (access to multiple services)
+az storage account generate-sas \
+  --account-name mystorageaccount \
+  --services b \
+  --resource-types sco \
+  --permissions rwdlac \
+  --expiry 2025-12-31T23:59:59Z \
+  --https-only
+
+# Container SAS (scoped to container)
+az storage container generate-sas \
+  --account-name mystorageaccount \
+  --name mycontainer \
+  --permissions rwdl \
+  --expiry 2025-12-31T23:59:59Z \
+  --https-only
+
+# Blob SAS (scoped to single blob)
+az storage blob generate-sas \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name myfile.pdf \
+  --permissions r \
+  --expiry 2025-12-31T23:59:59Z \
+  --https-only
+
+# Full URL with SAS
+https://mystorageaccount.blob.core.windows.net/mycontainer/myfile.pdf?sv=2021-08-06&ss=b&srt=sco&sp=rwdlac&se=2025-12-31T23:59:59Z&st=2025-12-29T00:00:00Z&spr=https&sig=signature</code>
+                </div>
+
+                <h3>🌐 Network Security</h3>
+
+                <ol class="step-list">
+                    <li>
+                        <strong>Enable Firewall Rules</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Default deny all
+az storage account update \
+  --name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --default-action Deny
+
+# Allow specific IP addresses
+az storage account network-rule add \
+  --account-name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --ip-address 203.0.113.5
+
+# Allow IP range (CIDR)
+az storage account network-rule add \
+  --account-name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --ip-address 203.0.113.0/24</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Configure Virtual Network Access</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Add VNet rule
+az storage account network-rule add \
+  --account-name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --vnet-name vnet-prod-eastus \
+  --subnet subnet-apps
+
+# Allow Azure services
+az storage account update \
+  --name mystorageaccount \
+  --resource-group rg-storage-prod \
+  --bypass AzureServices</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Create Private Endpoint</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Create private endpoint
+az network private-endpoint create \
+  --name pe-storage-prod \
+  --resource-group rg-storage-prod \
+  --vnet-name vnet-prod-eastus \
+  --subnet subnet-private-endpoints \
+  --private-connection-resource-id /subscriptions/{sub-id}/resourceGroups/rg-storage-prod/providers/Microsoft.Storage/storageAccounts/mystorageaccount \
+  --group-id blob \
+  --connection-name storage-connection
+
+# Create private DNS zone
+az network private-dns zone create \
+  --resource-group rg-storage-prod \
+  --name privatelink.blob.core.windows.net
+
+# Link DNS zone to VNet
+az network private-dns link vnet create \
+  --resource-group rg-storage-prod \
+  --zone-name privatelink.blob.core.windows.net \
+  --name storage-dns-link \
+  --virtual-network vnet-prod-eastus \
+  --registration-enabled false</code>
+                        </div>
+                    </li>
+                </ol>
+
+                <h3>📊 Monitoring & Logging</h3>
+
+                <h4>Enable Diagnostic Logs</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code># Create Log Analytics workspace
+az monitor log-analytics workspace create \
+  --resource-group rg-monitoring \
+  --workspace-name law-storage-prod
+
+# Enable diagnostic settings
+az monitor diagnostic-settings create \
+  --name storage-diagnostics \
+  --resource /subscriptions/{sub-id}/resourceGroups/rg-storage-prod/providers/Microsoft.Storage/storageAccounts/mystorageaccount/blobServices/default \
+  --workspace /subscriptions/{sub-id}/resourceGroups/rg-monitoring/providers/Microsoft.OperationalInsights/workspaces/law-storage-prod \
+  --logs '[{"category":"StorageRead","enabled":true},{"category":"StorageWrite","enabled":true},{"category":"StorageDelete","enabled":true}]' \
+  --metrics '[{"category":"Transaction","enabled":true},{"category":"Capacity","enabled":true}]'</code>
+                </div>
+
+                <h4>Key Metrics to Monitor</h4>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Capacity</h4>
+                        <p>Total storage used, blob count, container count</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Transactions</h4>
+                        <p>Read/write operations, success/failure rates, latency</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Availability</h4>
+                        <p>Service uptime, endpoint health, error rates</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Security</h4>
+                        <p>Authentication failures, SAS usage, unauthorized access attempts</p>
+                    </div>
+                </div>
+
+                <h4>Create Alerts</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code># Alert when storage capacity exceeds 80%
+az monitor metrics alert create \
+  --name alert-storage-capacity \
+  --resource-group rg-storage-prod \
+  --scopes /subscriptions/{sub-id}/resourceGroups/rg-storage-prod/providers/Microsoft.Storage/storageAccounts/mystorageaccount \
+  --condition "avg UsedCapacity > 800000000000" \
+  --description "Storage account capacity exceeds 80%" \
+  --evaluation-frequency 5m \
+  --window-size 15m \
+  --severity 2
+
+# Alert on high error rate
+az monitor metrics alert create \
+  --name alert-storage-errors \
+  --resource-group rg-storage-prod \
+  --scopes /subscriptions/{sub-id}/resourceGroups/rg-storage-prod/providers/Microsoft.Storage/storageAccounts/mystorageaccount/blobServices/default \
+  --condition "avg ClientServerErrors > 5" \
+  --description "High error rate on blob service" \
+  --evaluation-frequency 5m \
+  --window-size 15m \
+  --severity 1</code>
+                </div>
+
+                <div class="do-dont-grid">
+                    <div class="do-section">
+                        <h4>✓ DO's</h4>
+                        <ul>
+                            <li>Use Azure AD authentication over account keys</li>
+                            <li>Enable HTTPS-only access with TLS 1.2+</li>
+                            <li>Implement customer-managed keys for sensitive data</li>
+                            <li>Use private endpoints for internal apps</li>
+                            <li>Enable diagnostic logging for all storage accounts</li>
+                            <li>Rotate account keys regularly (90 days)</li>
+                            <li>Use SAS tokens with minimum permissions and expiry</li>
+                            <li>Enable soft delete for blob recovery</li>
+                            <li>Monitor security metrics and set alerts</li>
+                        </ul>
+                    </div>
+                    <div class="dont-section">
+                        <h4>✗ DON'Ts</h4>
+                        <ul>
+                            <li>Don't embed account keys in code or repos</li>
+                            <li>Don't use account keys for production apps</li>
+                            <li>Don't enable public blob access without review</li>
+                            <li>Don't ignore security recommendations</li>
+                            <li>Don't use HTTP (unencrypted) connections</li>
+                            <li>Don't create SAS tokens without expiry</li>
+                            <li>Don't grant excessive permissions</li>
+                            <li>Don't disable encryption at rest</li>
+                            <li>Don't skip network security configuration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BEST PRACTICES SECTION -->
+        <div id="practices" class="content-section">
+            <div class="card">
+                <h2>✨ Best Practices & Quick Reference</h2>
+                
+                <h3>📋 Naming Conventions Summary</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Resource</th>
+                                <th>Format</th>
+                                <th>Example</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Storage Account</td>
+                                <td>{org}{env}{region}{purpose}{##}</td>
+                                <td>contosoprodeastdata01</td>
+                                <td>3-24 chars, lowercase, no hyphens</td>
+                            </tr>
+                            <tr>
+                                <td>Resource Group</td>
+                                <td>rg-{purpose}-{env}-{region}</td>
+                                <td>rg-storage-prod-eastus</td>
+                                <td>1-90 chars, alphanumeric, hyphens</td>
+                            </tr>
+                            <tr>
+                                <td>Container</td>
+                                <td>{purpose}-{env}</td>
+                                <td>data-prod, logs-dev</td>
+                                <td>3-63 chars, lowercase, hyphens</td>
+                            </tr>
+                            <tr>
+                                <td>ADLS Gen2 Filesystem</td>
+                                <td>{domain}-{purpose}</td>
+                                <td>sales-datalake</td>
+                                <td>Same as container rules</td>
+                            </tr>
+                            <tr>
+                                <td>Key Vault</td>
+                                <td>kv-{purpose}-{env}-{region}</td>
+                                <td>kv-storage-prod-east</td>
+                                <td>3-24 chars, alphanumeric, hyphens</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>💰 Cost Optimization Strategies</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>1. Choose Right Redundancy</h4>
+                        <p>Use LRS for dev/test, ZRS for prod, GRS only when needed. Can save 50-75% on storage costs.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>2. Lifecycle Management</h4>
+                        <p>Auto-tier blobs: Hot→Cool (30d), Cool→Archive (90d). Save 50-95% on storage.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>3. Data Compression</h4>
+                        <p>Use Parquet, ORC, or compress before upload. Reduce storage by 70-90%.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>4. Delete Unused Resources</h4>
+                        <p>Remove old snapshots, unused containers, orphaned blobs. Audit monthly.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>5. Reserved Capacity</h4>
+                        <p>1-year or 3-year commit for predictable workloads. Save up to 38%.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>6. Monitor & Alert</h4>
+                        <p>Set budget alerts, review Cost Analysis monthly, rightsize resources.</p>
+                    </div>
+                </div>
+
+                <h3>⚡ Performance Best Practices</h3>
+                <ol class="step-list">
+                    <li>
+                        <strong>Use Correct Blob Type</strong>
+                        <p>Block blobs for general use, append blobs for logs, page blobs for VMs. Choose wisely for optimal performance.</p>
+                    </li>
+                    <li>
+                        <strong>Partition Data Effectively</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># Good: Time-based partitioning
+data/sales/2025/12/29/file.csv
+
+# Good: Hash-based distribution
+data/a1/b2/c3/file.csv
+
+# Bad: All files in root
+data/file1.csv, file2.csv, file3.csv</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Parallel Operations</strong>
+                        <p>Use multiple threads for upload/download. AzCopy automatically parallelizes. Azure SDKs support concurrency.</p>
+                    </li>
+                    <li>
+                        <strong>Use CDN for Global Access</strong>
+                        <p>Azure CDN caches blobs at edge locations. Reduce latency by 70-90% for global users.</p>
+                    </li>
+                    <li>
+                        <strong>Optimize Block Size</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <code># For large files (>100GB), use larger blocks
+azcopy copy '/local/bigfile.zip' \
+  'https://mystorageaccount.blob.core.windows.net/container/' \
+  --block-size-mb 100 \
+  --blob-type BlockBlob</code>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Use Premium Storage for IOPS</strong>
+                        <p>Premium storage (SSD) for databases, VMs, high-throughput applications. Standard for general use.</p>
+                    </li>
+                </ol>
+
+                <h3>🔒 Security Checklist</h3>
+                <div class="card" style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-left-color: var(--danger);">
+                    <h4>Critical Security Configurations</h4>
+                    <ul style="list-style: none;">
+                        <li>☐ HTTPS-only enabled (TLS 1.2 minimum)</li>
+                        <li>☐ Public blob access disabled (unless required)</li>
+                        <li>☐ Firewall rules configured</li>
+                        <li>☐ Private endpoints for internal apps</li>
+                        <li>☐ Azure AD authentication (avoid account keys)</li>
+                        <li>☐ SAS tokens with expiry and minimum permissions</li>
+                        <li>☐ Customer-managed keys for sensitive data</li>
+                        <li>☐ Soft delete enabled (7-365 days retention)</li>
+                        <li>☐ Versioning enabled for critical data</li>
+                        <li>☐ Diagnostic logging enabled</li>
+                        <li>☐ Security alerts configured</li>
+                        <li>☐ Regular access reviews and key rotation</li>
+                    </ul>
+                </div>
+
+                <h3>🚀 Common CLI Commands Quick Reference</h3>
+                
+                <h4>Storage Account Commands</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code># List all storage accounts
+az storage account list -o table
+
+# Get connection string
+az storage account show-connection-string \
+  --name mystorageaccount \
+  --resource-group myresourcegroup</code>
+                </div>
+
+                <h4>Container Commands</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code># List containers
+az storage container list \
+  --account-name mystorageaccount -o table</code>
+                </div>
+
+                <h4>Blob Upload & Download</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code># Upload blob
+az storage blob upload \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name myblob.txt \
+  --file /local/path/file.txt
+
+# Download blob
+az storage blob download \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name myblob.txt \
+  --file /local/path/file.txt</code>
+                </div>
+
+                <h4>Blob List & Delete</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code># List blobs
+az storage blob list \
+  --account-name mystorageaccount \
+  --container-name mycontainer -o table
+
+# Delete blob
+az storage blob delete \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name myblob.txt</code>
+                </div>
+
+                <h4>Blob URL & Copy</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code># Get blob URL
+az storage blob url \
+  --account-name mystorageaccount \
+  --container-name mycontainer \
+  --name myblob.txt
+
+# Copy blob between containers
+az storage blob copy start \
+  --account-name mystorageaccount \
+  --destination-container destcontainer \
+  --destination-blob destblob.txt \
+  --source-container sourcecontainer \
+  --source-blob sourceblob.txt</code>
+                </div>
+
+                <h3>🏗️ Complete End-to-End Workflow</h3>
+                <div class="diagram-container">
+        <div class="mermaid">
+graph LR
+    A[Plan] --> B[Design]
+    B --> C[Deploy]
+    C --> D[Configure]
+    D --> E[Secure]
+    E --> F[Ingest]
+    F --> G[Monitor]
+    G --> H[Optimize]
+    H --> A
+        </div>
+                </div>
+
+                <h3>📚 Additional Resources</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Documentation</h4>
+                        <p>Azure Storage Docs: <a href="https://docs.microsoft.com/azure/storage/" target="_blank">docs.microsoft.com/azure/storage</a></p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Pricing Calculator</h4>
+                        <p><a href="https://azure.microsoft.com/pricing/calculator/" target="_blank">azure.microsoft.com/pricing/calculator</a></p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Azure CLI Reference</h4>
+                        <p><a href="https://docs.microsoft.com/cli/azure/storage" target="_blank">docs.microsoft.com/cli/azure/storage</a></p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Storage Explorer</h4>
+                        <p>Download: <a href="https://azure.microsoft.com/features/storage-explorer/" target="_blank">azure.microsoft.com/features/storage-explorer</a></p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>💡 Pro Tip:</strong> Bookmark this guide and refer to it regularly. Azure Storage is constantly evolving with new features and best practices. Stay updated with Azure blog and What's New pages.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Azure Infrastructure & Storage Guide | Updated: December 2025</p>
+        <p>For the latest updates, refer to official Azure documentation</p>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+        // Initialize Mermaid - Simple version
+        console.log('Initializing Mermaid...');
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default'
+        });
+        console.log('Mermaid initialized');
+        
+        // Tab switching functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Remove active from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Mark clicked tab as active
+            const clickedTab = Array.from(tabs).find(tab => tab.getAttribute('onclick').includes(sectionId));
+            if (clickedTab) {
+                clickedTab.classList.add('active');
+            }
+
+            // Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Re-render mermaid diagrams
+            setTimeout(() => {
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.contentLoaded();
+                }
+            }, 100);
+        }
+
+        // Copy to clipboard functionality - Enhanced version
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            let code = codeBlock.querySelector('code');
+            
+            if (!code) return;
+            
+            // Get text content and clean it
+            let text = code.textContent || code.innerText;
+            text = text.trim();
+
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopySuccess(button);
+                }).catch(err => {
+                    console.error('Clipboard API failed:', err);
+                    fallbackCopy(text, button);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopy(text, button);
+            }
+        }
+
+        // Show copy success feedback
+        function showCopySuccess(button) {
+            const originalText = button.textContent;
+            button.textContent = '✓ Copied!';
+            button.classList.add('copied');
+            button.style.background = '#10b981';
+            button.style.borderColor = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('copied');
+                button.style.background = '';
+                button.style.borderColor = '';
+            }, 2000);
+        }
+
+        // Fallback copy method for older browsers
+        function fallbackCopy(text, button) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopySuccess(button);
+                } else {
+                    button.textContent = '✗ Error';
+                    setTimeout(() => {
+                        button.textContent = 'Copy';
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                button.textContent = '✗ Error';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Azure Guide loaded successfully');
+            
+            // Add smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            // Animate cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '0';
+                        entry.target.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            entry.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, 100);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.card').forEach(card => {
+                observer.observe(card);
+            });
+
+            // Test copy functionality
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            console.log(`Found ${copyButtons.length} copy buttons`);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Press 'Escape' to scroll to top
+            if (e.key === 'Escape') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
